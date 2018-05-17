@@ -25,7 +25,6 @@ function Login($Pseudo, $Password)
 {
     $dbh = ConnectDB();
     $req = $dbh->query("SELECT idPlayer, PseudoPlayer, PasswordPlayer, MD5('$Password') AS HashPassword FROM fishermenland.player WHERE PseudoPlayer = '$Pseudo'");
-    $req->execute(array());
     $reqArray = $req->fetch();
 
     return $reqArray;
@@ -79,10 +78,36 @@ function GetListSettings()
     return $req;
 }
 
-function UpdateSettings($ValueIntForm, $UpdateSettings)
+//Update the settings with the datas given by the admin
+function UpdateSettings($ValueIntForm, $IdUpdateSettings)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("UPDATE fishermenland.settings SET ValueInt = '$ValueIntForm' WHERE idSettings = '$UpdateSettings';");
+    $req = $dbh->query("UPDATE fishermenland.settings SET ValueInt = '$ValueIntForm' WHERE idSettings = '$IdUpdateSettings'");
 
     return $req;
+}
+
+//Check if the game chosen by the user still not full
+function CheckDisponiblityGame($IdJoinGame)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("SELECT MaxPlayersGame, (SELECT COUNT(fkGamePlace) as UsedPlaces FROM fishermenland.place WHERE fkGamePlace = '$IdJoinGame') FROM fishermenland.game WHERE idGame = '$IdJoinGame'");
+    $reqArray = $req->fetch();
+
+    return $reqArray;
+}
+
+//Create the place of the player
+function CreatePlace($Pseudo, $IdJoinGame)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("");
+
+    return $req;
+}
+
+//Show all the infos needed in game
+function ShowInfoGame($Pseudo, $IdJoinGame)
+{
+
 }

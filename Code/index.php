@@ -13,16 +13,20 @@ try
         {
             GoSettings();
         }
-        elseif(isset($_POST['UpdateSettings']))
+        elseif(isset($_POST['IdUpdateSettings'])) //The admin changed one value in the database
         {
-            DoUpdateSettings($_POST['ValueIntForm'], $_POST['UpdateSettings']);
+            DoUpdateSettings($_POST['ValueIntForm'], $_POST['IdUpdateSettings']);
+        }
+        elseif(isset($_POST['IdJoinGame'])) //The user want to join a game
+        {
+            GoGame($_SESSION['Pseudo'], $_POST['IdJoinGame']);
         }
         else //The user is logged and did nothing
         {
-            GoHome();
+            GoHome($_SESSION['Pseudo']);
         }
     }
-    elseif(isset($_GET['Signup'])) //An user want to signup
+    elseif(isset($_GET['Signup'])) //The user want to signup
     {
         if(isset($_POST['Signup'])) //The user has send a form for signup
         {

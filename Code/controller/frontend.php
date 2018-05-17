@@ -66,7 +66,7 @@ function DoSignup($Pseudo, $Password)
 }
 
 //List the games
-function GoHome()
+function GoHome($Pseudo)
 {
     $ListGames = GetListGames(); //Take the datas of the database
 
@@ -86,7 +86,7 @@ function GoHome()
     }
     require('view/frontend/HomeView.php');
 
-    $InfoAdmin = CheckAdmin($_SESSION['Pseudo']); //Check if the player is an admin
+    $InfoAdmin = CheckAdmin($Pseudo); //Check if the player is an admin
     if($InfoAdmin ->rowCount() > 0) //Check if the user is an admin
     {
         require('view/frontend/AdminView.php'); //Show the button to go on the settings page
@@ -108,8 +108,27 @@ function GoSettings()
 }
 
 //Update the Settings and go back to the settings page
-function DoUpdateSettings($ValueIntForm, $UpdateSettings)
+function DoUpdateSettings($ValueIntForm, $IdUpdateSettings)
 {
-    UpdateSettings($ValueIntForm, $UpdateSettings);
+    UpdateSettings($ValueIntForm, $IdUpdateSettings);
     GoSettings();
+}
+
+//Join a place in a game
+function GoGame($Pseudo, $IdJoinGame)
+{
+    $DisponobilityGame = CheckDisponiblityGame($IdJoinGame);
+    extract($DisponobilityGame); //$UsedPlaces, $MaxPlayersGame
+    if($UsedPlaces < $MaxPlayersGame)
+    {
+        echo "Bravo";
+    }
+    else
+    {
+        echo "La place n'est plus disponible";
+    }
+    //CreatePlace($Pseudo, $IdJoinGame);
+    //$InfoGame = ShowInfoGame($Pseudo, $IdJoinGame);
+
+    require('view/frontend/GameView.php'); //Show the button to go on the settings page
 }

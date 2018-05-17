@@ -22,7 +22,7 @@
             }
             elseif($key == 'idSettings') //Check if we are reading the key idSettings. Put a button with the ID of the row
             {
-                echo "<td><button type='submit' name='UpdateSettings' value='$value'>Valider</button></td>"; //Show the values of the array
+                echo "<td><button type='submit' name='IdUpdateSettings' value='$value'>Valider</button></td>"; //Show the values of the array
             }
             else //Show the other values
             {
