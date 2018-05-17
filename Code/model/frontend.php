@@ -1,6 +1,6 @@
 <?php
 
-//Connect to the database 
+//Connect to the database
 function ConnectDB()
 {
     //Required datas for connect to a database
@@ -16,7 +16,7 @@ function ConnectDB()
     $dbh = new PDO($connectionString, $username, $password);
     $dbh->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     $dbh->exec("SET NAMES UTF8");
-    
+
     return $dbh;
 }
 
@@ -24,7 +24,7 @@ function ConnectDB()
 function Login($Pseudo, $Password)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("SELECT idPlayer, PseudoPlayer, PasswordPlayer, MD5('$Password') as HashPassword FROM fishermenland.player WHERE PseudoPlayer = '$Pseudo'");
+    $req = $dbh->query("SELECT idPlayer, PseudoPlayer, PasswordPlayer, MD5('$Password') AS HashPassword FROM fishermenland.player WHERE PseudoPlayer = '$Pseudo'");
     $req->execute(array());
     $reqArray = $req->fetch();
 
@@ -36,16 +36,25 @@ function CheckAccount($Pseudo)
 {
     $dbh = ConnectDB();
     $req = $dbh->query("SELECT idPlayer, PseudoPlayer, PasswordPlayer FROM fishermenland.player WHERE PseudoPlayer = '$Pseudo'");
-    
+
     return $req;
 }
 
 //Create the account of the user
 function Signup($Pseudo, $Password)
-{    
+{
     $dbh = ConnectDB();
     $req = $dbh->query("INSERT INTO fishermenland.player (PseudoPlayer, PasswordPlayer) VALUES ('$Pseudo', MD5('$Password'))");
-    
+
+    return $req;
+}
+
+//Check if the user is an admin
+function CheckAdmin($Pseudo)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("SELECT AdminPlayer FROM fishermenland.player WHERE PseudoPlayer = '$Pseudo' AND AdminPlayer = '1'");
+
     return $req;
 }
 
@@ -54,9 +63,26 @@ function GetListGames()
 {
     $dbh = ConnectDB();
     $req = $dbh->query("SELECT idGame, LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, DescriptionType, COUNT(idPlace) AS OccupedPlaces
-    FROM fishermenland.game 
+    FROM fishermenland.game
     INNER JOIN fishermenland.type ON game.fkTypeGame = type.idType
     INNER JOIN fishermenland.place ON game.idGame = place.fkGamePlace GROUP BY idGame");
-    
+
+    return $req;
+}
+
+//Get the list of the settings who could be changed
+function GetListSettings()
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("SELECT idSettings, NameSettings, ValueInt, ValueDate, ValueChar, DescriptionSettings FROM fishermenland.settings");
+
+    return $req;
+}
+
+function UpdateSettings($ValueIntForm, $UpdateSettings)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.settings SET ValueInt = '$ValueIntForm' WHERE idSettings = '$UpdateSettings';");
+
     return $req;
 }

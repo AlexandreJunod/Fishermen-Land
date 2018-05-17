@@ -4,5 +4,5 @@
 function AccessAccepted($Pseudo)
 {
     $_SESSION['Pseudo'] = $Pseudo;
-    ListGames();
+    GoHome();
 }

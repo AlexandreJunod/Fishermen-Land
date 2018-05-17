@@ -131,6 +131,7 @@ CREATE TABLE IF NOT EXISTS fishermenland.settings (
   ValueInt INT(11) NULL DEFAULT NULL,
   ValueDate DATETIME NULL DEFAULT NULL,
   ValueChar VARCHAR(45) NULL DEFAULT NULL,
+  DescriptionSettings VARCHAR(100) NULL DEFAULT NULL,
   PRIMARY KEY (idSettings),
   UNIQUE INDEX idSettings_UNIQUE (idSettings ASC))
 ENGINE = InnoDB
@@ -150,13 +151,13 @@ INSERT INTO fishermenland.type (DescriptionType) VALUES ('Imposition');
 INSERT INTO fishermenland.type (DescriptionType) VALUES ('Imposition avec forfait');
 
 -- Add the settings
-INSERT INTO fishermenland.settings (NameSettings, ValueInt) VALUES ('MaxPlayers', '6');
-INSERT INTO fishermenland.settings (NameSettings, ValueInt) VALUES ('DefaultLakeFishes', '60');
-INSERT INTO fishermenland.settings (NameSettings, ValueInt) VALUES ('DefaulPondFishes', '3');
-INSERT INTO fishermenland.settings (NameSettings, ValueInt) VALUES ('ReleaseMax', '3');
-INSERT INTO fishermenland.settings (NameSettings, ValueInt) VALUES ('SeasonTour', '3');
-INSERT INTO fishermenland.settings (NameSettings, ValueInt) VALUES ('LakeReproduction', '3');
-INSERT INTO fishermenland.settings (NameSettings, ValueInt) VALUES ('PondReproduction', '1');
-INSERT INTO fishermenland.settings (NameSettings, ValueInt) VALUES ('EatenFishes', '2');
-INSERT INTO fishermenland.settings (NameSettings, ValueInt) VALUES ('NeededGameToRank', '3');
+INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('MaxPlayers', '6', 'Nombre de joueurs max dans une partie');
+INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('DefaultLakeFishes', '60', 'Nombre de poissons dans le lac');
+INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('DefaulPondFishes', '3', 'Nombre de poissons par défault dans l\'étang');
+INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('ReleaseMax', '3', 'Nombre max de poissons relâchés en mode imposition avec forfait');
+INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('SeasonTour', '3', 'Nombre de tours dans une saison de pêche');
+INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('LakeReproduction', '3', 'Reproduction dans le lac, 2 poissons en feront :');
+INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('PondReproduction', '1', 'Reproduction dans l\'étang, 2 poissons en feront :');
+INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('EatenFishes', '2', 'Nombre de poissons mangés par tour afin de survivre');
+INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('NeededGameToRank', '3', 'Nombre de partie nécessaires pour être classé');
 

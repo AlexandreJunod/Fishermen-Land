@@ -14,11 +14,11 @@ function DoLogin($Pseudo, $Password)
     if(isset($Pseudo) && isset($Password))
     {
         $InfoLogins = Login($Pseudo, $Password); //Check if the account exists
-        
+
         if($InfoLogins != NULL) //If datas are returned, the pseudo exists
         {
             extract($InfoLogins); //$idPlayer, $PseudoPlayer, $PasswordPlayer, $HashPassword
-            
+
             if($PasswordPlayer == $HashPassword) //Check if the password gived by the user is the same than the password hashed of the data base
             {
                 AccessAccepted($Pseudo);
@@ -27,14 +27,14 @@ function DoLogin($Pseudo, $Password)
             else
             {
                 $Error = "Le mot de passe est erroné";
-                unset($_SESSION['Pseudo']); //Dont let the session start     
+                unset($_SESSION['Pseudo']); //Dont let the session start
                 unset($Pseudo); //Dont let the session start;
             }
-        } 
+        }
         else //No datas were returned, the pseudo was not find
         {
             $Error = "Le pseudo est erroné";
-            unset($_SESSION['Pseudo']); //Dont let the session start     
+            unset($_SESSION['Pseudo']); //Dont let the session start
             unset($Pseudo); //Dont let the session start;
         }
     }
@@ -48,11 +48,11 @@ function DoSignup($Pseudo, $Password)
     if(isset($Pseudo) && isset($Password))
     {
         $InfosSignup = CheckAccount($Pseudo); //Check if the account exists
-        
+
         if($InfosSignup->rowCount() > 0) //Check if the user is already on the database
         {
             $Error = "Ce pseudo existe déjà"; //Varriable to show the error message
-            unset($_SESSION['Pseudo']); //Dont let the session start     
+            unset($_SESSION['Pseudo']); //Dont let the session start
             unset($Pseudo); //Dont let the session start;
         }
         else //Create the account and save the session
@@ -65,22 +65,51 @@ function DoSignup($Pseudo, $Password)
     require('view/frontend/SignupView.php');
 }
 
-//List the games 
-function ListGames()
+//List the games
+function GoHome()
 {
     $ListGames = GetListGames(); //Take the datas of the database
-    
-    $ShowGames = array(); //Create the array with informations about the games.
-    foreach($ListGames as $ListGame) //Create an array with the different games and the values
+
+    $ShowGames = array(); //Create the array for informations about the games
+    foreach($ListGames as $ListGame)
     {
-        if($ListGame['TourGame'] == NULL) //Check if the game has started
+        if($ListGame['TourGame'] == NULL || $ListGame['TourGame'] == 0) //Check if the game has started, the gane would be joignable
         {
-            array_push($ShowGames, array('idGame' => $ListGame['idGame'], 'LakeFishesGame' => $ListGame['LakeFishesGame'], 'LakeReproductionGame' => $ListGame['LakeReproductionGame'], 'PondReproductionGame' => $ListGame['PondReproductionGame'], 'EatFishesGame' => $ListGame['EatFishesGame'], 'FirstPlayerGame' => $ListGame['FirstPlayerGame'], 'TourGame' => $ListGame['TourGame'], 'SeasonTourGame' => $ListGame['SeasonTourGame'], 'MaxPlayersGame' => $ListGame['MaxPlayersGame'], 'MaxReleaseGame' => $ListGame['MaxReleaseGame'], 'DescriptionType' => $ListGame['DescriptionType'], 'OccupedPlaces' => $ListGame['OccupedPlaces'], 'CanJoin' => 'Yes'));
+            //Put the datas in the array $ShowGames
+            array_push($ShowGames, array('idGame' => $ListGame['idGame'], 'LakeFishesGame' => $ListGame['LakeFishesGame'], 'LakeReproductionGame' => $ListGame['LakeReproductionGame'], 'PondReproductionGame' => $ListGame['PondReproductionGame'], 'EatFishesGame' => $ListGame['EatFishesGame'], 'FirstPlayerGame' => $ListGame['FirstPlayerGame'], 'TourGame' => $ListGame['TourGame'], 'SeasonTourGame' => $ListGame['SeasonTourGame'], 'MaxPlayersGame' => $ListGame['MaxPlayersGame'], 'MaxReleaseGame' => $ListGame['MaxReleaseGame'], 'DescriptionType' => $ListGame['DescriptionType'], 'OccupedPlaces' => $ListGame['OccupedPlaces'], 'UsedPlaces' => $ListGame['OccupedPlaces'].'/'.$ListGame['MaxPlayersGame'], 'Status' => 'En attente', 'CanJoin' => 'Yes'));
         }
-        else
+        else //The game has started and is injoignable
         {
-            array_push($ShowGames, array('idGame' => $ListGame['idGame'], 'LakeFishesGame' => $ListGame['LakeFishesGame'], 'LakeReproductionGame' => $ListGame['LakeReproductionGame'], 'PondReproductionGame' => $ListGame['PondReproductionGame'], 'EatFishesGame' => $ListGame['EatFishesGame'], 'FirstPlayerGame' => $ListGame['FirstPlayerGame'], 'TourGame' => $ListGame['TourGame'], 'SeasonTourGame' => $ListGame['SeasonTourGame'], 'MaxPlayersGame' => $ListGame['MaxPlayersGame'], 'MaxReleaseGame' => $ListGame['MaxReleaseGame'], 'DescriptionType' => $ListGame['DescriptionType'], 'OccupedPlaces' => $ListGame['OccupedPlaces'], 'CanJoin' => 'No'));
+            //Put the datas in the array $ShowGames
+            array_push($ShowGames, array('idGame' => $ListGame['idGame'], 'LakeFishesGame' => $ListGame['LakeFishesGame'], 'LakeReproductionGame' => $ListGame['LakeReproductionGame'], 'PondReproductionGame' => $ListGame['PondReproductionGame'], 'EatFishesGame' => $ListGame['EatFishesGame'], 'FirstPlayerGame' => $ListGame['FirstPlayerGame'], 'TourGame' => $ListGame['TourGame'], 'SeasonTourGame' => $ListGame['SeasonTourGame'], 'MaxPlayersGame' => $ListGame['MaxPlayersGame'], 'MaxReleaseGame' => $ListGame['MaxReleaseGame'], 'DescriptionType' => $ListGame['DescriptionType'], 'OccupedPlaces' => $ListGame['OccupedPlaces'], 'UsedPlaces' => $ListGame['OccupedPlaces'].'/'.$ListGame['MaxPlayersGame'], 'Status' => 'En cours', 'CanJoin' => 'No'));
         }
     }
     require('view/frontend/HomeView.php');
+
+    $InfoAdmin = CheckAdmin($_SESSION['Pseudo']); //Check if the player is an admin
+    if($InfoAdmin ->rowCount() > 0) //Check if the user is an admin
+    {
+        require('view/frontend/AdminView.php'); //Show the button to go on the settings page
+    }
+}
+
+//List all the settings
+function GoSettings()
+{
+    $ListSettings = GetListSettings(); //Take the datas of the database
+
+    $ShowSettings = array(); //Create the array for the settings
+    foreach($ListSettings as $ListSetting)
+    {
+        //Put the datas in the array $ShowSettings
+        array_push($ShowSettings, array('DescriptionSettings' => $ListSetting['DescriptionSettings'], 'ValueInt' => $ListSetting['ValueInt'], 'idSettings' => $ListSetting['idSettings']));
+    }
+    require('view/frontend/SettingsView.php');
+}
+
+//Update the Settings and go back to the settings page
+function DoUpdateSettings($ValueIntForm, $UpdateSettings)
+{
+    UpdateSettings($ValueIntForm, $UpdateSettings);
+    GoSettings();
 }

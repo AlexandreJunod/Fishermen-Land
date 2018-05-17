@@ -1,4 +1,4 @@
-<?php $title = 'Login'; ?>
+<?php $title = 'Connexion'; ?>
 
 <?php ob_start(); ?>
     <h1>Connexion</h1>
