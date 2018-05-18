@@ -57,14 +57,13 @@ function CheckAdmin($Pseudo)
     return $req;
 }
 
-//Get the list of the games and the datas
+//Get the list of the games
 function GetListGames()
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("SELECT idGame, LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, DescriptionType, COUNT(idPlace) AS OccupedPlaces
+    $req = $dbh->query("SELECT idGame, LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, DescriptionType, (SELECT COUNT(idPlace) FROM fishermenland.place WHERE fkGamePlace = idGame) AS OccupedPlaces
     FROM fishermenland.game
-    INNER JOIN fishermenland.type ON game.fkTypeGame = type.idType
-    INNER JOIN fishermenland.place ON game.idGame = place.fkGamePlace GROUP BY idGame");
+    INNER JOIN fishermenland.type ON game.fkTypeGame = type.idType GROUP BY idGame");
 
     return $req;
 }
@@ -91,17 +90,47 @@ function UpdateSettings($ValueIntForm, $IdUpdateSettings)
 function CheckDisponiblityGame($IdJoinGame)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("SELECT MaxPlayersGame, (SELECT COUNT(fkGamePlace) as UsedPlaces FROM fishermenland.place WHERE fkGamePlace = '$IdJoinGame') FROM fishermenland.game WHERE idGame = '$IdJoinGame'");
+    $req = $dbh->query("SELECT MaxPlayersGame, (SELECT COUNT(fkGamePlace) FROM fishermenland.place WHERE fkGamePlace = '$IdJoinGame') as UsedPlaces FROM fishermenland.game WHERE idGame = '$IdJoinGame'");
+    $reqArray = $req->fetch();
+
+    return $reqArray;
+}
+
+//Gives the biggest value in the OrderPlace
+function GetBiggestOrder($IdJoinGame)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("SELECT OrderPlace FROM fishermenland.place WHERE fkGamePlace = '$IdJoinGame' ORDER BY OrderPlace DESC LIMIT 1");
+    $reqArray = $req->fetch();
+
+    return $reqArray;
+}
+
+//Gives the ID of the player logged
+function GiveIdLogged($Pseudo)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("SELECT idPlayer FROM fishermenland.player WHERE PseudoPlayer = '$Pseudo'");
+    $reqArray = $req->fetch();
+
+    return $reqArray;
+}
+
+//Gives the default nomber of fishes in the pond
+function GetPondFishes()
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("SELECT ValueInt FROM fishermenland.settings  WHERE NameSettings = 'DefaulPondFishes'");
     $reqArray = $req->fetch();
 
     return $reqArray;
 }
 
 //Create the place of the player
-function CreatePlace($Pseudo, $IdJoinGame)
+function CreatePlace($IdJoinGame, $OrderPlace, $idPlayer, $ValueInt)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("");
+    $req = $dbh->query("INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('$ValueInt', '0', '0', '$OrderPlace', '$idPlayer', '1', '$IdJoinGame')");
 
     return $req;
 }

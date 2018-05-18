@@ -28,14 +28,14 @@ function DoLogin($Pseudo, $Password)
             {
                 $Error = "Le mot de passe est erroné";
                 unset($_SESSION['Pseudo']); //Dont let the session start
-                unset($Pseudo); //Dont let the session start;
+                unset($Pseudo); //Dont let the session start
             }
         }
         else //No datas were returned, the pseudo was not find
         {
             $Error = "Le pseudo est erroné";
             unset($_SESSION['Pseudo']); //Dont let the session start
-            unset($Pseudo); //Dont let the session start;
+            unset($Pseudo); //Dont let the session start
         }
     }
     require('view/frontend/LoginView.php');
@@ -66,7 +66,7 @@ function DoSignup($Pseudo, $Password)
 }
 
 //List the games
-function GoHome($Pseudo)
+function GoHome($Pseudo, $Error)
 {
     $ListGames = GetListGames(); //Take the datas of the database
 
@@ -117,18 +117,26 @@ function DoUpdateSettings($ValueIntForm, $IdUpdateSettings)
 //Join a place in a game
 function GoGame($Pseudo, $IdJoinGame)
 {
-    $DisponobilityGame = CheckDisponiblityGame($IdJoinGame);
+    $DisponobilityGame = CheckDisponiblityGame($IdJoinGame); //Check if there's a place on the game selected
     extract($DisponobilityGame); //$UsedPlaces, $MaxPlayersGame
-    if($UsedPlaces < $MaxPlayersGame)
+
+    if($UsedPlaces < $MaxPlayersGame) //Create the place and take the infos of the game if there's a place
     {
-        echo "Bravo";
+        $GetBiggestOrder = GetBiggestOrder($IdJoinGame); //Get the biggest order
+        $GetIdLogged = GiveIdLogged($Pseudo); //Get the id of the logged user
+        $GetPondFishes = GetPondFishes(); //Get the default value of the amount of fishes to put in the pond
+
+        extract($GetBiggestOrder); //$OrderPlace
+        extract($GetIdLogged); //$idPlayer
+        extract($GetPondFishes); //$ValueInt
+        $OrderPlace++; //Biggest order +1 = my place
+        CreatePlace($IdJoinGame, $OrderPlace, $idPlayer, $ValueInt); //Create the place of the player
+        //$InfoGame = ShowInfoGame($Pseudo, $IdJoinGame);
     }
     else
     {
-        echo "La place n'est plus disponible";
+        $Error = "La place n'est plus disponible"; //Varriable to show the error message
+        GoHome($Pseudo, $Error);
     }
-    //CreatePlace($Pseudo, $IdJoinGame);
-    //$InfoGame = ShowInfoGame($Pseudo, $IdJoinGame);
-
     require('view/frontend/GameView.php'); //Show the button to go on the settings page
 }

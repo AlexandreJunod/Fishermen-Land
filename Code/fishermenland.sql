@@ -42,7 +42,6 @@ CREATE TABLE IF NOT EXISTS fishermenland.game (
   fkTypeGame INT(11) NOT NULL,
   PRIMARY KEY (idGame),
   UNIQUE INDEX idGame_UNIQUE (idGame ASC),
-  UNIQUE INDEX FirstPlayer_UNIQUE (FirstPlayerGame ASC),
   INDEX fk_Game_Type1_idx (fkTypeGame ASC),
   CONSTRAINT fk_Game_Type1
     FOREIGN KEY (fkTypeGame)
@@ -142,8 +141,48 @@ SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
--- Add 1 player, used for test
+-- Add 40 player, used for test
 INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer, AdminPlayer) VALUES ('Alexandre', MD5('Alexandre'), '1');
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Mikel1', MD5('Mikel1'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Stuart', MD5('Stuart'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer, AdminPlayer) VALUES ('Jeremy', MD5('Jeremy'), '1');
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Jarod1', MD5('Jarod1'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Kevin1', MD5('Kevin1'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Senistan', MD5('Senistan'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer, AdminPlayer) VALUES ('Michel', MD5('Michel'), '1');
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Vincent', MD5('Vincent'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Antonio', MD5('Antonio'));
+
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest1', MD5('Guest1'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest2', MD5('Guest2'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest3', MD5('Guest3'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest4', MD5('Guest4'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest5', MD5('Guest5'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest6', MD5('Guest6'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest7', MD5('Guest7'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest8', MD5('Guest8'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest9', MD5('Guest9'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest10', MD5('Guest10'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest11', MD5('Guest11'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest12', MD5('Guest12'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest13', MD5('Guest13'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest14', MD5('Guest14'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest15', MD5('Guest15'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest16', MD5('Guest16'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest17', MD5('Guest17'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest18', MD5('Guest18'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest19', MD5('Guest19'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest20', MD5('Guest20'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest21', MD5('Guest21'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest22', MD5('Guest22'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest23', MD5('Guest23'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest24', MD5('Guest24'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest25', MD5('Guest25'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest26', MD5('Guest26'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest27', MD5('Guest27'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest28', MD5('Guest28'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest29', MD5('Guest29'));
+INSERT INTO fishermenland.Player (PseudoPlayer, PasswordPlayer) VALUES ('Guest30', MD5('Guest30'));
 
 -- Add the different types of game
 INSERT INTO fishermenland.type (DescriptionType) VALUES ('Coopératif');
@@ -160,4 +199,37 @@ INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings)
 INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('PondReproduction', '1', 'Reproduction dans l\'étang, 2 poissons en feront :');
 INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('EatenFishes', '2', 'Nombre de poissons mangés par tour afin de survivre');
 INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('NeededGameToRank', '3', 'Nombre de partie nécessaires pour être classé');
+
+-- Add the status
+INSERT INTO fishermenland.status (DescriptionStatus) VALUES ('En attente');
+INSERT INTO fishermenland.status (DescriptionStatus) VALUES ('Joue');
+INSERT INTO fishermenland.status (DescriptionStatus) VALUES ('Eliminé');
+
+-- Create 6 games and put players in the game. Used for test
+INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('450', '2', '2', '4', 'Vincent', '7', '18', '6', '25', '3');
+INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('846', '4', '0', '8', 'Jarod1', '21', '30', '12', NULL, '2');
+INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('211', '3', '1', '3', 'Jeremy', '1', '18', '8', NULL, '1');
+INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('60', '3', '1', '2', 'Alexandre', NULL, '18', '6', NULL, '1'); 
+INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('60', '3', '1', '2', 'Mikel1', NULL, '18', '6', NULL, '2');
+INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('60', '3', '1', '2', 'Stuart', NULL, '18', '6', '10', '3'); 
+INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('60', '3', '1', '2', 'Alexandre', NULL, '18', '6', '10', '2'); 
+
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('87', '212', '37', '1', '40', '1', '1');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('41', '456', '410', '2', '39', '1', '1');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('341', '452', '123', '3', '38', '2', '1');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('112', '41', '12', '4', '37', '1', '1');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('31', '45', '10', '5', '36', '1', '1');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('0', '456', '300', '6', '35', '3', '1');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('87', '564', '0', '1', '34', '1', '2');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('41', '234', '0', '2', '33', '3', '2');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('341', '452', '0', '3', '32', '2', '2');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('87', '564', '0', '1', '31', '1', '3');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('41', '234', '0', '2', '30', '3', '3');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('3', '0', '0', '1', '17', '1', '4');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('3', '0', '0', '2', '14', '1', '5');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('3', '0', '0', '1', '15', '1', '5');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('3', '0', '0', '3', '12', '1', '6');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('3', '0', '0', '1', '11', '1', '6');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('3', '0', '0', '2', '13', '1', '6');
+
 

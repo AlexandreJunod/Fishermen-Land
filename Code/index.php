@@ -23,7 +23,7 @@ try
         }
         else //The user is logged and did nothing
         {
-            GoHome($_SESSION['Pseudo']);
+            GoHome($_SESSION['Pseudo'], NULL);
         }
     }
     elseif(isset($_GET['Signup'])) //The user want to signup
