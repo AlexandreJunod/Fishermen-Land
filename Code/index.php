@@ -19,7 +19,15 @@ try
         }
         elseif(isset($_POST['IdJoinGame'])) //The user want to join a game
         {
-            GoGame($_SESSION['Pseudo'], $_POST['IdJoinGame']);
+            DoCreatePlace($_SESSION['Pseudo'], $_POST['IdJoinGame']);
+        }
+        elseif(isset($_POST['LeaveGame'])) //The player wants to leave the game
+        {
+            DoDeletePlace($_POST['LeaveGame']);
+        }
+        elseif(isset($_POST['Fish'])) //The player is fishing
+        {
+            DoFish($_POST['NbFishing'], $_SESSION['idPlace'], $_SESSION['idGame']);
         }
         else //The user is logged and did nothing
         {

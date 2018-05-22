@@ -14,7 +14,12 @@
 
 <?php
 if(isset($Pseudo))
-    {
-        $_SESSION['Pseudo'] = $Pseudo;
-    }
+{
+    $_SESSION['Pseudo'] = $Pseudo;
+}
+if(isset($idPlace))
+{
+    $_SESSION['idPlace'] = $idPlace;
+    $_SESSION['idGame'] = $idGame;
+}
 ?>

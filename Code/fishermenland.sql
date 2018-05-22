@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS fishermenland.game (
   LakeReproductionGame  INT(11) NOT NULL,
   PondReproductionGame  INT(11) NOT NULL,
   EatFishesGame INT(11) NOT NULL, 
-  FirstPlayerGame VARCHAR(45) NOT NULL,
+  FirstPlayerGame VARCHAR(45) NULL DEFAULT NULL,
   TourGame INT(11) NULL DEFAULT NULL,
   SeasonTourGame INT(11) NOT NULL,
   MaxPlayersGame INT(11) NOT NULL,
@@ -203,6 +203,7 @@ INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings)
 -- Add the status
 INSERT INTO fishermenland.status (DescriptionStatus) VALUES ('En attente');
 INSERT INTO fishermenland.status (DescriptionStatus) VALUES ('Joue');
+INSERT INTO fishermenland.status (DescriptionStatus) VALUES ('Relâche des poissons');
 INSERT INTO fishermenland.status (DescriptionStatus) VALUES ('Eliminé');
 
 -- Create 6 games and put players in the game. Used for test
