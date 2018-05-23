@@ -137,7 +137,7 @@ function DoCreatePlace($Pseudo, $IdJoinGame)
         }
         else
         {
-            $OrderPlace = 1;
+            $OrderPlace = 0;
         }
         extract($GetIdLogged); //$idPlayer
         extract($GetPondFishes); //$ValueInt
@@ -170,17 +170,29 @@ function GoGame($idPlace, $idGame)
         //Put the datas in the array $ShowPlayers
         array_push($ShowPlayers, array('PondFishesPlace' => $InfoPlayer['PondFishesPlace'], 'FishedFishesPlace' => $InfoPlayer['FishedFishesPlace'], 'ReleasedFishesPlace' => $InfoPlayer['ReleasedFishesPlace'], 'OrderPlace' => $InfoPlayer['OrderPlace'], 'PseudoPlayer' => $InfoPlayer['PseudoPlayer'], 'RankingPlayer' => $InfoPlayer['RankingPlayer'], 'DescriptionStatus' => $InfoPlayer['DescriptionStatus']));
 
-        if($InfoPlayer['OrderPlace'] == '1') //Select the pseudo of the first player to use it on a query
+        if($InfoPlayer['OrderPlace'] == '0') //Select the pseudo of the first player to use it on a query
         {
             $FirstPlayer = $InfoPlayer['PseudoPlayer'];
+        }
+        if($InfoPlayer['DescriptionStatus'] == 'Joue' || $InfoPlayer['DescriptionStatus'] == 'Relâche des poissons') //Select the player who is playing
+        {
+            $FirstPlaying = $InfoPlayer['OrderPlace'];
         }
     }
 
     $ShowGameInfos = array(); //Create the array for informations about the game
     foreach($InfoGames as $InfoGame)
     {
-        //Put the datas in the array $ShowGames
-        array_push($ShowGameInfos, array('LakeFishesGame' => $InfoGame['LakeFishesGame'], 'LakeReproductionGame' => $InfoGame['LakeReproductionGame'], 'PondReproductionGame' => $InfoGame['PondReproductionGame'], 'EatFishesGame' => $InfoGame['EatFishesGame'], 'FirstPlayerGame' => $InfoGame['FirstPlayerGame'], 'TourGame' => $InfoGame['TourGame'], 'SeasonTourGame' => $InfoGame['SeasonTourGame'], 'MaxPlayersGame' => $InfoGame['MaxPlayersGame'], 'MaxReleaseGame' => $InfoGame['MaxReleaseGame'], 'DescriptionType' => $InfoGame['DescriptionType'], 'OccupedPlaces' => $InfoGame['OccupedPlaces']));
+        if(isset($FirstPlaying)) //Select the number of the next player who plays
+        {
+            //Put the datas in the array $ShowGames
+            array_push($ShowGameInfos, array('LakeFishesGame' => $InfoGame['LakeFishesGame'], 'LakeReproductionGame' => $InfoGame['LakeReproductionGame'], 'PondReproductionGame' => $InfoGame['PondReproductionGame'], 'EatFishesGame' => $InfoGame['EatFishesGame'], 'FirstPlayerGame' => $InfoGame['FirstPlayerGame'], 'TourGame' => $InfoGame['TourGame'], 'SeasonTourGame' => $InfoGame['SeasonTourGame'], 'MaxPlayersGame' => $InfoGame['MaxPlayersGame'], 'MaxReleaseGame' => $InfoGame['MaxReleaseGame'], 'DescriptionType' => $InfoGame['DescriptionType'], 'OccupedPlaces' => $InfoGame['OccupedPlaces'], 'NextPlayer' => ($FirstPlaying + 6) % ($InfoGame['MaxPlayersGame'] -1)));
+        }
+        else
+        {
+            //Put the datas in the array $ShowGames
+            array_push($ShowGameInfos, array('LakeFishesGame' => $InfoGame['LakeFishesGame'], 'LakeReproductionGame' => $InfoGame['LakeReproductionGame'], 'PondReproductionGame' => $InfoGame['PondReproductionGame'], 'EatFishesGame' => $InfoGame['EatFishesGame'], 'FirstPlayerGame' => $InfoGame['FirstPlayerGame'], 'TourGame' => $InfoGame['TourGame'], 'SeasonTourGame' => $InfoGame['SeasonTourGame'], 'MaxPlayersGame' => $InfoGame['MaxPlayersGame'], 'MaxReleaseGame' => $InfoGame['MaxReleaseGame'], 'DescriptionType' => $InfoGame['DescriptionType'], 'OccupedPlaces' => $InfoGame['OccupedPlaces'], 'NextPlayer' => 'Pas défini'));
+        }
     }
 
     if($InfoGame['OccupedPlaces'] >= $InfoGame['MaxPlayersGame']) //Check if the game has started
@@ -207,7 +219,6 @@ function DoDeletePlace($IdLeavePlace)
     unset($idPlace);
     unset($idGame);
     GoHome($_SESSION['Pseudo'], NULL);
-
 }
 
 //Fish in the lake
@@ -216,3 +227,11 @@ function doFish($NbFishing, $idPlace, $idGame)
     Fish($NbFishing, $idPlace, $idGame);
     GoGame($idPlace, $idGame);
 }
+
+/*The player pass her round and wait the next
+function DoPassRound($idPlace, $idGame)
+{
+    echo $NextPlayer.'<br>';
+    GoGame($idPlace, $idGame);
+    //PassRound($idPlace);
+}*/

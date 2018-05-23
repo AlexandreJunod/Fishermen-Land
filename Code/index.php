@@ -29,6 +29,10 @@ try
         {
             DoFish($_POST['NbFishing'], $_SESSION['idPlace'], $_SESSION['idGame']);
         }
+        /*elseif(isset($_POST['PassRound'])) //The player pass her round
+        {
+            DoPassRound($_SESSION['idPlace'], $_SESSION['idGame']);
+        }*/
         else //The user is logged and did nothing
         {
             GoHome($_SESSION['Pseudo'], NULL);

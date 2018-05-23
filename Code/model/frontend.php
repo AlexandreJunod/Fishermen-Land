@@ -158,7 +158,7 @@ function IdCreatedPlace($Pseudo)
 function ShowInfoPlayers($idGame)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("SELECT PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, PseudoPlayer, RankingPlayer, DescriptionStatus FROM fishermenland.place
+    $req = $dbh->query("SELECT idPlace, PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, PseudoPlayer, RankingPlayer, DescriptionStatus FROM fishermenland.place
     INNER JOIN fishermenland.player ON place.fkPlayerPlace = player.idPlayer
     INNER JOIN fishermenland.status ON place.fkStatusPlace = status.idStatus WHERE fkGamePlace = '$idGame'");
 
@@ -189,7 +189,7 @@ function DeletePlace($IdLeavePlace)
 function Fish($NbFishing, $idPlace, $idGame)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = PondFishesPlace + '$NbFishing' WHERE idPlace = '$idPlace'");
+    $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = PondFishesPlace + '$NbFishing', FishedFishesPlace = FishedFishesPlace + '$NbFishing' WHERE idPlace = '$idPlace'");
     $req = $dbh->query("UPDATE fishermenland.game SET LakeFishesGame = LakeFishesGame - '$NbFishing' WHERE idGame = '$idGame'");
 
     return $req;

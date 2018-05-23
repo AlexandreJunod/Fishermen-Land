@@ -38,6 +38,7 @@
         <td>Relâche max</td>
         <td>Type de partie</td>
         <td>Joueurs</td>
+        <td>Prochain joueur</td>
     </tr>
     <?php foreach($ShowGameInfos as $ShowGameInfo) //Reading each row of the table
     {
