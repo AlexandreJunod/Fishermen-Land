@@ -17,7 +17,6 @@ CREATE SCHEMA fishermenland;
 CREATE TABLE IF NOT EXISTS fishermenland.type (
   idType INT(11) NOT NULL AUTO_INCREMENT,
   DescriptionType VARCHAR(45) NULL DEFAULT NULL,
-  RecordType VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (idType),
   UNIQUE INDEX idType_UNIQUE (idType ASC))
 ENGINE = InnoDB
@@ -65,6 +64,26 @@ CREATE TABLE IF NOT EXISTS fishermenland.player (
   PRIMARY KEY (idPlayer),
   UNIQUE INDEX idPlayer_UNIQUE (idPlayer ASC),
   UNIQUE INDEX PseudoPlayer_UNIQUE (PseudoPlayer ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table fishermenland.history
+-- Containe the history of the games of all players
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS fishermenland.history (
+  idHistory INT NOT NULL AUTO_INCREMENT,
+  ScoreHistory VARCHAR(45) NOT NULL,
+  fkPlayerHistory INT(11) NOT NULL,
+  PRIMARY KEY (idHistory),
+  UNIQUE INDEX idHistory_UNIQUE (idHistory ASC),
+  INDEX fk_history_player1_idx (fkPlayerHistory ASC),
+  CONSTRAINT fk_history_player1
+    FOREIGN KEY (fkPlayerHistory)
+    REFERENCES fishermenland.player (idPlayer)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -207,7 +226,7 @@ INSERT INTO fishermenland.status (DescriptionStatus) VALUES ('Relâche des poiss
 INSERT INTO fishermenland.status (DescriptionStatus) VALUES ('Eliminé');
 
 -- Create 6 games and put players in the game. Used for test
-INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('450', '2', '2', '4', NULL, NULL, '18', '6', '25', '3');
+INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('450', '2', '2', '4', NULL, NULL, '18', '6', '25', '1');
 INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('846', '4', '0', '8', 'Jarod1', '21', '30', '12', NULL, '2');
 INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('211', '3', '1', '3', 'Jeremy', '1', '18', '8', NULL, '1');
 INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('60', '3', '1', '2', 'Alexandre', NULL, '18', '6', NULL, '1'); 
@@ -215,11 +234,11 @@ INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReprod
 INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('60', '3', '1', '2', 'Stuart', NULL, '18', '6', '10', '3'); 
 INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ('60', '3', '1', '2', 'Alexandre', NULL, '18', '6', '10', '2'); 
 
-INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('41', '456', '410', '0', '39', '1', '1');
-INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('341', '452', '123', '1', '38', '1', '1');
-INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('112', '41', '12', '2', '37', '1', '1');
-INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('31', '45', '10', '3', '36', '1', '1');
-INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('0', '456', '300', '4', '35', '1', '1');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('3', '0', '0', '0', '39', '1', '1');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('3', '0', '0', '1', '38', '1', '1');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('3', '0', '0', '2', '37', '1', '1');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('3', '0', '0', '3', '36', '1', '1');
+INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('3', '0', '0', '4', '35', '1', '1');
 INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('87', '564', '0', '0', '34', '1', '2');
 INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('41', '234', '0', '1', '33', '1', '2');
 INSERT INTO fishermenland.place (PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, fkPlayerPlace, fkStatusPlace, fkGamePlace) VALUES ('341', '452', '0', '2', '32', '1', '2');

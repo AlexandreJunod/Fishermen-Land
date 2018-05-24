@@ -1,0 +1,26 @@
+/* Tables form */
+table{
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 40%;
+}
+
+td, th{
+    border: 1px solid black;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even){
+    background-color: #d9d9d9;
+}
+
+tr:nth-child(odd){
+    background-color: White;
+}
+
+tr:nth-child(1){
+    background-color: White;
+    font-size: 15px;
+    font-weight: bold;
+}

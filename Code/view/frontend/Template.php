@@ -16,6 +16,7 @@
 if(isset($Pseudo))
 {
     $_SESSION['Pseudo'] = $Pseudo;
+    $_SESSION['MyID'] = $idPlayer;
 }
 if(isset($idPlace))
 {

@@ -11,6 +11,7 @@
         <td>Etat</td>
         <td>Boutton</td>
     </tr>
+    <tr></tr>
     <form method='post' id='FormJoinGame'></form>
 
 <?php foreach($ShowGames as $ShowGame) //Reading each row of the table

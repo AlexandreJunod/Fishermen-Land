@@ -160,7 +160,7 @@ function ShowInfoPlayers($idGame)
     $dbh = ConnectDB();
     $req = $dbh->query("SELECT idPlace, PondFishesPlace, FishedFishesPlace, ReleasedFishesPlace, OrderPlace, PseudoPlayer, RankingPlayer, DescriptionStatus FROM fishermenland.place
     INNER JOIN fishermenland.player ON place.fkPlayerPlace = player.idPlayer
-    INNER JOIN fishermenland.status ON place.fkStatusPlace = status.idStatus WHERE fkGamePlace = '$idGame'");
+    INNER JOIN fishermenland.status ON place.fkStatusPlace = status.idStatus WHERE fkGamePlace = '$idGame' ORDER BY OrderPlace ASC");
 
     return $req;
 }
@@ -169,7 +169,7 @@ function ShowInfoPlayers($idGame)
 function ShowInfoGames($idGame)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("SELECT LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, DescriptionType, (SELECT COUNT(idPlace) FROM fishermenland.place WHERE fkGamePlace = idGame) AS OccupedPlaces
+    $req = $dbh->query("SELECT idGame, LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, DescriptionType, (SELECT COUNT(idPlace) FROM fishermenland.place WHERE fkGamePlace = idGame) AS OccupedPlaces
     FROM fishermenland.game
     INNER JOIN fishermenland.type ON game.fkTypeGame = type.idType WHERE idGame = '$idGame'");
 
@@ -195,6 +195,25 @@ function Fish($NbFishing, $idPlace, $idGame)
     return $req;
 }
 
+//Release fishes from the pond
+function Release($NbReleasing, $idPlace, $idGame)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = PondFishesPlace - '$NbReleasing', ReleasedFishesPlace = ReleasedFishesPlace + '$NbReleasing' WHERE idPlace = '$idPlace'");
+    $req = $dbh->query("UPDATE fishermenland.game SET LakeFishesGame = LakeFishesGame + '$NbReleasing' WHERE idGame = '$idGame'");
+
+    return $req;
+}
+
+//Change the status from "Joue" in "Relâche des poissons"
+function ChangeStatusRelease($idPlace)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.place SET fkStatusPlace = '3' WHERE idPlace = '$idPlace'");
+
+    return $req;
+}
+
 //The first tour start, the name of the first player is saved and the first player have to play
 function StartGame($idGame, $FirstPlayer)
 {
@@ -203,4 +222,38 @@ function StartGame($idGame, $FirstPlayer)
     $req = $dbh->query("UPDATE fishermenland.place SET fkStatusPlace = '2' WHERE fkPlayerPlace = (SELECT idPlayer FROM fishermenland.player WHERE PseudoPlayer = '$FirstPlayer')");
 
     return $req;
+}
+
+//Player passes her round
+function PassRound($PassRound, $idPlace, $idGame)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.place SET fkStatusPlace = '1' WHERE idPlace = '$idPlace'");
+    $req = $dbh->query("UPDATE fishermenland.place SET fkStatusPlace = '2' WHERE fkGamePlace = '$idGame' AND OrderPlace = '$PassRound'");
+
+    return $req;
+}
+
+//Check the rank of all player and return the datas
+function CheckRank()
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("SELECT AVG(ScoreHistory) AS AVGScoreHistory, fkPlayerHistory FROM fishermenland.history GROUP BY fkPlayerHistory ASC");
+
+    return $req;
+}
+
+//Update the rank of all players
+function UpdateRank($Rank, $fkPlayerHistory)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.player SET RankingPlayer = '$Rank' WHERE idPlayer = '$fkPlayerHistory'");
+
+    return $req;
+}
+
+//Save the game in the history
+function SaveGame($idOfPlayer)
+{
+
 }

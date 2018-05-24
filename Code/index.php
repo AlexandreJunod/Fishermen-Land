@@ -29,10 +29,14 @@ try
         {
             DoFish($_POST['NbFishing'], $_SESSION['idPlace'], $_SESSION['idGame']);
         }
-        /*elseif(isset($_POST['PassRound'])) //The player pass her round
+        elseif(isset($_POST['Release'])) //The player is releasing fishes
         {
-            DoPassRound($_SESSION['idPlace'], $_SESSION['idGame']);
-        }*/
+            DoRelease($_POST['Release'], $_POST['NbReleasing'], $_SESSION['idPlace'], $_SESSION['idGame']);
+        }
+        elseif(isset($_POST['PassRound'])) //The player pass her round
+        {
+            DoPassRound($_POST['PassRound'], $_SESSION['idPlace'], $_SESSION['idGame']);
+        }
         else //The user is logged and did nothing
         {
             GoHome($_SESSION['Pseudo'], NULL);
