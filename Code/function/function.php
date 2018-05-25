@@ -1,7 +1,7 @@
 <?php
 
 //Save the session when the Access was accepted after a login or a signup
-function AccessAccepted($Pseudo)
+function AccessAccepted($Pseudo, $idPlayer)
 {
     $_SESSION['Pseudo'] = $Pseudo;
     $_SESSION['MyID'] = $idPlayer;

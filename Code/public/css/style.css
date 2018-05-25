@@ -24,3 +24,12 @@ tr:nth-child(1){
     font-size: 15px;
     font-weight: bold;
 }
+
+.HiddenDiv {
+    display: none;
+}
+
+
+.DivForShow:hover + .HiddenDiv{
+    display: block;
+}

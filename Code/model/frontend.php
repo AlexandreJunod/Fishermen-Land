@@ -238,22 +238,35 @@ function PassRound($PassRound, $idPlace, $idGame)
 function CheckRank()
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("SELECT AVG(ScoreHistory) AS AVGScoreHistory, fkPlayerHistory FROM fishermenland.history GROUP BY fkPlayerHistory ASC");
+    $req = $dbh->query("SELECT AVG(ScoreHistory) AS AVGScoreHistory, fkPlayerHistory FROM fishermenland.history  GROUP BY fkPlayerHistory ASC HAVING COUNT(fkPlayerHistory) >= (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'NeededGameToRank')");
 
     return $req;
 }
 
-//Update the rank of all players
+//Delete the ranks and next update the rank of all players who have the number of required games
 function UpdateRank($Rank, $fkPlayerHistory)
 {
     $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.player SET RankingPlayer = NULL");
     $req = $dbh->query("UPDATE fishermenland.player SET RankingPlayer = '$Rank' WHERE idPlayer = '$fkPlayerHistory'");
 
     return $req;
 }
 
 //Save the game in the history
-function SaveGame($idOfPlayer)
+function SaveGame($idPlayer)
 {
+    $dbh = ConnectDB();
+    $req = $dbh->query("INSERT INTO fishermenland.history (ScoreHistory, fkPlayerHistory) VALUES ('50','$idPlayer')");
 
+    return $req;
+}
+
+//New tour is starting
+function AddTour($idGame)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.game SET TourGame = TourGame + '1' WHERE idGame = '$idGame'");
+
+    return $req;
 }

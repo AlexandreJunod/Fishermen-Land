@@ -16,7 +16,7 @@ function DoLogin($Pseudo, $Password)
 
             if($PasswordPlayer == $HashPassword) //Check if the password gived by the user is the same than the password hashed of the data base
             {
-                AccessAccepted($Pseudo);
+                AccessAccepted($Pseudo, $idPlayer);
                 return;
             }
             else
@@ -114,6 +114,7 @@ function GoSettings()
 //Update the Settings and go back to the settings page
 function DoUpdateSettings($ValueIntForm, $IdUpdateSettings)
 {
+    header('Location: index.php'); //Prevent to spam form
     UpdateSettings($ValueIntForm, $IdUpdateSettings);
     GoSettings();
 }
@@ -121,6 +122,7 @@ function DoUpdateSettings($ValueIntForm, $IdUpdateSettings)
 //Join a place in a game
 function DoCreatePlace($Pseudo, $IdJoinGame)
 {
+    header('Location: index.php'); //Prevent to spam form
     $DisponobilityGame = CheckDisponiblityGame($IdJoinGame); //Check if there's a place on the game selected
     extract($DisponobilityGame); //$UsedPlaces, $MaxPlayersGame
 
@@ -166,42 +168,45 @@ function GoGame($idPlace, $idGame)
 
     foreach($ShowGameInfos as $ShowGameInfo)
     {
-            $FirstPlayer = $InfoPlayer['PseudoPlayer'];
-        if($ShowGameInfo['OccupedPlaces'] >= $ShowGameInfo['MaxPlayersGame']) //Check if the game has started
+        if($ShowGameInfo['TourGame'] == NULL && $ShowGameInfo['OccupedPlaces'] >= $ShowGameInfo['MaxPlayersGame']) //If the first round hasn't start and game is full, the game starts
         {
-            if($ShowGameInfo['TourGame'] == NULL) //If the first round hasn't start, the game starts
+            if($ShowGameInfo['NextFirstPlayer'] != 'Non disponible') //Prevent to assign "Non disponible" as first user
             {
-                if($ShowGameInfo['NextFirstPlayer'] != 'Non disponible') //Prevent to assign "Non disponible" as first user
-                {
-                    StartGame($idGame, $ShowGameInfo['NextFirstPlayer']); //The game has started
-                }
-            }
-            if($ShowGameInfo['CurrentPlayer'] == $_SESSION['Pseudo']) //Show the buttons to the player who is playing
-            {
-                switch ($ShowGameInfo['Action']){ //Select wich actions the player can do
-                    case 'Joue':
-                        require('view/frontend/GamePlayingView.php'); //Show the buttons for playing
-                        break;
-                    case 'Relâche des poissons':
-                        require('view/frontend/GameReleasingView.php'); //Show the buttons for releasing
-                        break;
-                }
+                StartGame($idGame, $ShowGameInfo['NextFirstPlayer']); //The game has started
             }
         }
-        else //Tell to the players, the game hasn't started
+        elseif($ShowGameInfo['TourGame'] == NULL) //Tell to the players how many players are missing when the game hasn't started
         {
             $NeededPlayers = $ShowGameInfo['MaxPlayersGame'] - $ShowGameInfo['OccupedPlaces'];
             $Error = "En attente de ".$NeededPlayers." joueurs";
         }
+        elseif($ShowGameInfo['TourGame'] >= $ShowGameInfo['SeasonTourGame'] || $ShowGameInfo['OccupedPlaces']<=1) //The game has ended
+        {
+            DoDeletePlace($idPlace);
+            return;
+        }
+
+        if($ShowGameInfo['CurrentPlayer'] == $_SESSION['Pseudo']) //Show the buttons to the player who is playing
+        {
+            switch ($ShowGameInfo['Action']){ //Select wich actions the player can do
+                case 'Joue':
+                    require('view/frontend/GamePlayingView.php'); //Show the buttons for playing
+                    break;
+                case 'Relâche des poissons':
+                    require('view/frontend/GameReleasingView.php'); //Show the buttons for releasing
+                    break;
+            }
+        }
     }
-    DoUpdateRank();
+    ?><script>setInterval(function(){location.reload()},3000);</script><?php //Refresh the page
     require('view/frontend/GameView.php'); //Show the game selected by the player
 }
 
 //Delete the place and redirect to the home page. Save the game in the history
 function DoDeletePlace($IdLeavePlace)
 {
-    SaveGame($IdLeavePlace);
+    header('Location: index.php'); //Prevent to spam form
+    DoUpdateRank();
     DeletePlace($IdLeavePlace);
     unset($_SESSION['$idPlace']);
     unset($_SESSION['$idGame']);
@@ -211,8 +216,9 @@ function DoDeletePlace($IdLeavePlace)
 }
 
 //Fish in the lake
-function doFish($NbFishing, $idPlace, $idGame)
+function DoFish($NbFishing, $idPlace, $idGame)
 {
+    header('Location: index.php'); //Prevent to spam form
     Fish($NbFishing, $idPlace, $idGame);
     $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
 
@@ -222,14 +228,15 @@ function doFish($NbFishing, $idPlace, $idGame)
 
 function DoRelease($PassRound, $NbReleasing, $idPlace, $idGame)
 {
+    header('Location: index.php'); //Prevent to spam form
     Release($NbReleasing, $idPlace, $idGame);
-    PassRound($PassRound, $idPlace, $idGame);
-    GoGame($idPlace, $idGame);
+    DoPassRound($PassRound, $idPlace, $idGame);
 }
 
 //Change de status of the current user and of the next user
 function DoPassRound($PassRound, $idPlace, $idGame)
 {
+    header('Location: index.php'); //Prevent to spam form
     $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
     $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
 
@@ -237,48 +244,45 @@ function DoPassRound($PassRound, $idPlace, $idGame)
     {
         if($ShowGameInfo['idGame'] == $idGame)
         {
-            switch ($ShowGameInfo['DescriptionType']){  //Look wich type of game it is
-                case 'Coopératif': //Check if the player is playing or relasing fishes, if he hasn't release yet, he can't pass
-                    foreach($ShowPlayers as $ShowPlayer)
+            foreach($ShowPlayers as $ShowPlayer) //Take the infos about the players
+            {
+                if($ShowPlayer['idPlace'] == $idPlace)
+                {
+                    if($ShowGameInfo['DescriptionType'] == 'Coopératif' && $ShowPlayer['DescriptionStatus'] == 'Joue')
                     {
-                        foreach ($ShowPlayer as $key => $value)
-                        {
-                            if($key == 'idPlace' && $value == $idPlace)
-                            {
-                                if($ShowPlayer['DescriptionStatus'] == 'Joue')
-                                {
-                                    ChangeStatusRelease($idPlace);
-                                }
-                            }
-                        }
+                        ChangeStatusRelease($idPlace);
                     }
-                    break;
-                case 'Imposition':
-                    PassRound($PassRound, $idPlace, $idGame);
-                    break;
-                case 'Imposition avec forfait':
-                    PassRound($PassRound, $idPlace, $idGame);
-                    break;
+                    else
+                    {
+                        DoAddTour($ShowGameInfo['NextPlayer'], $idGame);
+                        PassRound($PassRound, $idPlace, $idGame);
+                    }
+                }
             }
         }
     }
     GoGame($idPlace, $idGame);
 }
 
+//Add 1 tour when it's a new tour
+function DoAddTour($NextPlayer, $idGame)
+{
+    if($NextPlayer == 0) //if the next player is 0, add a tour
+    {
+        AddTour($idGame);
+    }
+}
 //To calculate the rank make an AVG() of all the scores grouped by the id of the player who make theses scores, and sort in ascending order. Next foreach entry give a rank with the id on the array
 function DoUpdateRank()
 {
+    SaveGame($_SESSION['MyID']);
     $ListRanks = CheckRank();
+    $Rank = 0;
 
-    $ArrayWithRanks = array(); //Create the array for keep the ranks and a number
+    //$ArrayWithRanks = array(); //Create the array for keep the ranks and a number
     foreach($ListRanks as $ListRanks)
     {
-        //Put the datas in the array $ArrayWithRanks
-        array_push($ArrayWithRanks, array('AVGScoreHistory' =>  $ListRanks['AVGScoreHistory'], 'fkPlayerHistory' => $ListRanks['fkPlayerHistory']));
-    }
-    foreach($ArrayWithRanks as $key => $value) //Change the rank of all players
-    {
-        $Rank = $key + 1;
-        UpdateRank($Rank, $ListRanks['fkPlayerHistory']);
+        $Rank++;
+        UpdateRank($Rank, $ListRanks['fkPlayerHistory']); //Change the rank of all players
     }
 }

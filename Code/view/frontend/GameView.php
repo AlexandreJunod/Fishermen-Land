@@ -69,41 +69,44 @@ $SumFishes = 0; //Variable to count the nomber total of fishes
 </table>
 <br>
 
-<!-- Show the statistics -->
-<h4>Statistiques</h4>
-<?php echo "Saison de pêche ".$ShowGameInfo['TourGame']."/".$ShowGameInfo['SeasonTourGame']."<br>";
-echo "Nombre total de poissons = $SumFishes<br>";
-foreach($ShowPlayers as $ShowPlayer) //Reading each row of the table
-{
-    foreach ($ShowPlayer as $key => $value)
-    {
-        if($key == 'PseudoPlayer' || $key == 'RankingPlayer' || $key == 'PondFishesPlace' || $key == 'FishedFishesPlace' || $key == 'ReleasedFishesPlace')
-        {
-            switch ($key){ //Select the values needed to show statistics and give a div for each value
-                case 'PseudoPlayer':
-                    echo "<div class='StatisticsPseudo'>";
-                    break;
-                case 'RankingPlayer':
-                    echo "Classement: <div class='StatisticsRank'>";
-                    break;
-                case 'PondFishesPlace':
-                    echo "Poisson(s) dans l'étang: <div class='StatisticsPond'>";
-                    break;
-                case 'FishedFishesPlace':
-                    echo "Poisson(s) pêché(s): <div class='StatisticsFished'>";
-                    break;
-                case 'ReleasedFishesPlace':
-                    echo "Poisson(s) relâché(s): <div class='StatisticsReleased'>";
-                    break;
-            }
-            echo $value."</div><br>";
-        }
-    }
-}?>
-
 <form method='post'> <!-- Leave the game -->
     <?= "<button type='submit' name='LeaveGame' value=".$idPlace.">Quitter la partie</button>"; ?>
 </form>
+
+<!-- Show the statistics -->
+<div class='DivForShow'>Voir les scores ? Mets ta souris ici</div>
+<div class='HiddenDiv'>
+    <h4>Statistiques</h4>
+    <?php echo "Saison de pêche ".$ShowGameInfo['TourGame']."/".$ShowGameInfo['SeasonTourGame']."<br>";
+    echo "Nombre total de poissons = $SumFishes<br>";
+    foreach($ShowPlayers as $ShowPlayer) //Reading each row of the table
+    {
+        foreach ($ShowPlayer as $key => $value)
+        {
+            if($key == 'PseudoPlayer' || $key == 'RankingPlayer' || $key == 'PondFishesPlace' || $key == 'FishedFishesPlace' || $key == 'ReleasedFishesPlace')
+            {
+                switch ($key){ //Select the values needed to show statistics and give a div for each value
+                    case 'PseudoPlayer':
+                        echo "<div class='StatisticsPseudo'>";
+                        break;
+                    case 'RankingPlayer':
+                        echo "Classement: <div class='StatisticsRank'>";
+                        break;
+                    case 'PondFishesPlace':
+                        echo "Poisson(s) dans l'étang: <div class='StatisticsPond'>";
+                        break;
+                    case 'FishedFishesPlace':
+                        echo "Poisson(s) pêché(s): <div class='StatisticsFished'>";
+                        break;
+                    case 'ReleasedFishesPlace':
+                        echo "Poisson(s) relâché(s): <div class='StatisticsReleased'>";
+                        break;
+                }
+                echo $value."</div><br>";
+            }
+        }
+    }?>
+</div>
 
 <?php $content = ob_get_clean(); ?>
 
