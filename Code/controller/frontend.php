@@ -63,6 +63,7 @@ function DoSignup($Pseudo, $Password)
 //List the games
 function GoHome($Pseudo, $Error)
 {
+    echo $Error;
     $GetIdCreatedPlace = IdCreatedPlace($Pseudo);
     if($GetIdCreatedPlace == NULL) //The player isn't assigned to a place
     {
@@ -93,7 +94,7 @@ function GoHome($Pseudo, $Error)
     else
     {
         extract($GetIdCreatedPlace); //$idPlace, $fkGamePlace
-        GoGame($idPlace, $fkGamePlace);
+        GoGame($idPlace, $fkGamePlace, $Error);
     }
 }
 
@@ -161,7 +162,7 @@ function DoCreatePlace($Pseudo, $IdJoinGame)
     }
 }
 
-function GoGame($idPlace, $idGame)
+function GoGame($idPlace, $idGame, $Error)
 {
     $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
     $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
@@ -197,8 +198,11 @@ function GoGame($idPlace, $idGame)
                     break;
             }
         }
+        else //The player isn't playing
+        {
+            ?><script>setInterval(function(){location.reload()},3000);</script><?php // Refresh the page
+        }
     }
-    ?><script>setInterval(function(){location.reload()},3000);</script><?php //Refresh the page
     require('view/frontend/GameView.php'); //Show the game selected by the player
 }
 
@@ -219,11 +223,33 @@ function DoDeletePlace($IdLeavePlace)
 function DoFish($NbFishing, $idPlace, $idGame)
 {
     header('Location: index.php'); //Prevent to spam form
-    Fish($NbFishing, $idPlace, $idGame);
-    $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
+    $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
+    foreach($ShowPlayers as $ShowPlayer)
+    {
+        if($ShowPlayer['idPlace'] == $idPlace)
+        {
+            $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
+            foreach($ShowGameInfos as $ShowGameInfo){} //Create the array $ShowGameInfo for check values
 
-    foreach($ShowGameInfos as $ShowGameInfo){} //Create the array $ShowGameInfo for check values
-    DoPassRound($ShowGameInfo['NextPlayer'], $idPlace, $idGame);
+            if($NbFishing > $ShowPlayer['PondFishesPlace']) //The player is trying to fish more than the number on his pond
+            {
+                $Error = "Vous ne pouvez pas pêcher plus de poissons que ce que vous possédez déjà";
+                GoHome($_SESSION['Pseudo'], $Error);
+                return;
+            }
+            elseif($NbFishing > $ShowGameInfo['LakeFishesGame'])
+            {
+                $Error = "Vous ne pouvez pas pêcher plus de poissons que ce que le lac ne possède";
+                GoHome($_SESSION['Pseudo'], $Error);
+                return;
+            }
+            else
+            {
+                Fish($NbFishing, $idPlace, $idGame);
+                DoPassRound($ShowGameInfo['NextPlayer'], $idPlace, $idGame);
+            }
+        }
+    }
 }
 
 function DoRelease($PassRound, $NbReleasing, $idPlace, $idGame)
@@ -261,7 +287,7 @@ function DoPassRound($PassRound, $idPlace, $idGame)
             }
         }
     }
-    GoGame($idPlace, $idGame);
+    GoGame($idPlace, $idGame, NULL);
 }
 
 //Add 1 tour when it's a new tour

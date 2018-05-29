@@ -4,7 +4,6 @@
 $SumFishes = 0; //Variable to count the nomber total of fishes
 ?>
 
-
 <!-- Show players -->
 <h3>Fishermen Land</h3>
 <table border='1'>
@@ -65,7 +64,8 @@ $SumFishes = 0; //Variable to count the nomber total of fishes
                 $SumFishes += $value;
             }
         }
-    } ?>
+    }
+    ?>
 </table>
 <br>
 

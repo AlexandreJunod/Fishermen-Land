@@ -25,7 +25,7 @@ try
         {
             DoDeletePlace($_POST['LeaveGame']);
         }
-        elseif(isset($_POST['Fish'])) //The player is fishing
+        elseif(isset($_POST['NbFishing'])) //The player is fishing
         {
             DoFish($_POST['NbFishing'], $_SESSION['idPlace'], $_SESSION['idGame']);
         }
