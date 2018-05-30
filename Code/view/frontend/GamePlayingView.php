@@ -1,9 +1,9 @@
 <?php $title = 'Fishermen Land'; ?>
 
-<?php ob_start(); ?>
+<?php ob_start();?>
 <form id='PlayerIsPlaying' method='post'> <!-- Select number of fishes to fish -->
     Poisson(s) à pêcher<br>
-    <input type="text" name="NbFishing" minlength="1" value='0' required autofocus>
+    <input type="number" name="NbFishing" min="0" placeholder="0" required autofocus>
     <button type="submit" name="Fish">Pêcher</button>
 </form>
 
@@ -14,7 +14,7 @@
 <script>
 function play()
 {
-    $( "#PlayerIsPlaying" ).submit(); //Send the form automatically after 15 seconds
+    $("#PlayerIsPlaying").submit(); //Send the form automatically after 15 seconds
 }
 setTimeout(play, 15000);
 </script>

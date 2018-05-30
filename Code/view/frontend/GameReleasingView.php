@@ -1,9 +1,9 @@
 <?php $title = 'Fishermen Land'; ?>
 
-<?php ob_start(); ?>
+<?php ob_start();?>
 <form method='post'> <!-- Select number of fishes to fish -->
     Poisson(s) à relâcher<br>
-    <input type="text" name="NbReleasing" minlength="1" value='0' required autofocus>
+    <input type="number" name="NbReleasing" min="0" value='0' required autofocus>
     <button id='PlayerSubmitRelease' type='submit' name='Release' value='<?= $ShowGameInfo['NextPlayer'] ?>'>Relâcher</button>
 </form>
 

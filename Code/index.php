@@ -29,8 +29,12 @@ try
         {
             DoFish($_POST['NbFishing'], $_SESSION['idPlace'], $_SESSION['idGame']);
         }
-        elseif(isset($_POST['Release'])) //The player is releasing fishes
+        elseif(isset($_POST['NbReleasing'])) //The player is releasing fishes
         {
+            if(!isset($_POST['Release'])) //Release 0 fishes if the user hasn't type a number
+            {
+                $_POST['Release'] = '0';
+            }
             DoRelease($_POST['Release'], $_POST['NbReleasing'], $_SESSION['idPlace'], $_SESSION['idGame']);
         }
         elseif(isset($_POST['PassRound'])) //The player pass her round

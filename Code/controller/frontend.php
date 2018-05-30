@@ -53,7 +53,7 @@ function DoSignup($Pseudo, $Password)
         else //Create the account and save the session
         {
             Signup($Pseudo, $Password); //Create the account
-            AccessAccepted($Pseudo);
+            DoLogin($Pseudo, $Password); //Login the player
             return;
         }
     }
@@ -63,11 +63,10 @@ function DoSignup($Pseudo, $Password)
 //List the games
 function GoHome($Pseudo, $Error)
 {
-    echo $Error;
     $GetIdCreatedPlace = IdCreatedPlace($Pseudo);
     if($GetIdCreatedPlace == NULL) //The player isn't assigned to a place
     {
-        $ListGames = GetListGames(); //Take the datas of the database
+        $ListGames = GetListGames(); //List all the games
 
         $ShowGames = array(); //Create the array for informations about the games
         foreach($ListGames as $ListGame)
@@ -222,7 +221,6 @@ function DoDeletePlace($IdLeavePlace)
 //Fish in the lake
 function DoFish($NbFishing, $idPlace, $idGame)
 {
-    header('Location: index.php'); //Prevent to spam form
     $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
     foreach($ShowPlayers as $ShowPlayer)
     {
@@ -235,13 +233,11 @@ function DoFish($NbFishing, $idPlace, $idGame)
             {
                 $Error = "Vous ne pouvez pas pêcher plus de poissons que ce que vous possédez déjà";
                 GoHome($_SESSION['Pseudo'], $Error);
-                return;
             }
             elseif($NbFishing > $ShowGameInfo['LakeFishesGame'])
             {
                 $Error = "Vous ne pouvez pas pêcher plus de poissons que ce que le lac ne possède";
                 GoHome($_SESSION['Pseudo'], $Error);
-                return;
             }
             else
             {
@@ -254,9 +250,26 @@ function DoFish($NbFishing, $idPlace, $idGame)
 
 function DoRelease($PassRound, $NbReleasing, $idPlace, $idGame)
 {
-    header('Location: index.php'); //Prevent to spam form
-    Release($NbReleasing, $idPlace, $idGame);
-    DoPassRound($PassRound, $idPlace, $idGame);
+    $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
+    foreach($ShowPlayers as $ShowPlayer)
+    {
+        if($ShowPlayer['idPlace'] == $idPlace)
+        {
+            $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
+            foreach($ShowGameInfos as $ShowGameInfo){} //Create the array $ShowGameInfo for check values
+
+            if($NbReleasing > $ShowPlayer['PondFishesPlace']) //The player is trying to fish more than the number on his pond
+            {
+                $Error = "Vous ne pouvez pas relâcher plus de poissons que ce que vous ne possédez";
+                GoHome($_SESSION['Pseudo'], $Error);
+            }
+            else
+            {
+                Release($NbReleasing, $idPlace, $idGame);
+                DoPassRound($PassRound, $idPlace, $idGame);
+            }
+        }
+    }
 }
 
 //Change de status of the current user and of the next user
@@ -266,7 +279,7 @@ function DoPassRound($PassRound, $idPlace, $idGame)
     $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
     $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
 
-    foreach($ShowGameInfos as $ShowGameInfo) //If game is on cooperative, player will have to select an amount of fishes to drop
+    foreach($ShowGameInfos as $ShowGameInfo)
     {
         if($ShowGameInfo['idGame'] == $idGame)
         {
@@ -274,11 +287,11 @@ function DoPassRound($PassRound, $idPlace, $idGame)
             {
                 if($ShowPlayer['idPlace'] == $idPlace)
                 {
-                    if($ShowGameInfo['DescriptionType'] == 'Coopératif' && $ShowPlayer['DescriptionStatus'] == 'Joue')
+                    if($ShowGameInfo['DescriptionType'] == 'Coopératif' && $ShowPlayer['DescriptionStatus'] == 'Joue') //If game is on cooperative, player will have to select an amount of fishes to drop
                     {
                         ChangeStatusRelease($idPlace);
                     }
-                    else
+                    else //The player haven't to drop fishes
                     {
                         DoAddTour($ShowGameInfo['NextPlayer'], $idGame);
                         PassRound($PassRound, $idPlace, $idGame);
@@ -293,8 +306,17 @@ function DoPassRound($PassRound, $idPlace, $idGame)
 //Add 1 tour when it's a new tour
 function DoAddTour($NextPlayer, $idGame)
 {
-    if($NextPlayer == 0) //if the next player is 0, add a tour
+    if($NextPlayer == 0) //if the next player is 0, add a tour and fishes make new fishes
     {
+        $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
+
+        foreach($ShowGameInfos as $ShowGameInfo)
+        {
+            if($ShowGameInfo['idGame'] == $idGame) //if this is the game who is starting a new round, give new fishes
+            {
+                AddNewFishes($ShowGameInfo['LakeReproductionGame'], $ShowGameInfo['PondReproductionGame']);
+            }
+        }
         AddTour($idGame);
     }
 }

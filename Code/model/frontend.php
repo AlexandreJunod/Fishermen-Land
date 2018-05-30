@@ -44,8 +44,6 @@ function Signup($Pseudo, $Password)
 {
     $dbh = ConnectDB();
     $req = $dbh->query("INSERT INTO fishermenland.player (PseudoPlayer, PasswordPlayer) VALUES ('$Pseudo', MD5('$Password'))");
-
-    return $req;
 }
 
 //Check if the user is an admin
@@ -82,8 +80,6 @@ function UpdateSettings($ValueIntForm, $IdUpdateSettings)
 {
     $dbh = ConnectDB();
     $req = $dbh->query("UPDATE fishermenland.settings SET ValueInt = '$ValueIntForm' WHERE idSettings = '$IdUpdateSettings'");
-
-    return $req;
 }
 
 //Check if the game chosen by the user still not full
@@ -181,8 +177,6 @@ function DeletePlace($IdLeavePlace)
 {
     $dbh = ConnectDB();
     $req = $dbh->query("DELETE FROM fishermenland.place WHERE idPlace = '$IdLeavePlace'");
-
-    return $req;
 }
 
 //Fish in the lake
@@ -191,8 +185,6 @@ function Fish($NbFishing, $idPlace, $idGame)
     $dbh = ConnectDB();
     $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = PondFishesPlace + '$NbFishing', FishedFishesPlace = FishedFishesPlace + '$NbFishing' WHERE idPlace = '$idPlace'");
     $req = $dbh->query("UPDATE fishermenland.game SET LakeFishesGame = LakeFishesGame - '$NbFishing' WHERE idGame = '$idGame'");
-
-    return $req;
 }
 
 //Release fishes from the pond
@@ -201,8 +193,6 @@ function Release($NbReleasing, $idPlace, $idGame)
     $dbh = ConnectDB();
     $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = PondFishesPlace - '$NbReleasing', ReleasedFishesPlace = ReleasedFishesPlace + '$NbReleasing' WHERE idPlace = '$idPlace'");
     $req = $dbh->query("UPDATE fishermenland.game SET LakeFishesGame = LakeFishesGame + '$NbReleasing' WHERE idGame = '$idGame'");
-
-    return $req;
 }
 
 //Change the status from "Joue" in "Relâche des poissons"
@@ -210,8 +200,6 @@ function ChangeStatusRelease($idPlace)
 {
     $dbh = ConnectDB();
     $req = $dbh->query("UPDATE fishermenland.place SET fkStatusPlace = '3' WHERE idPlace = '$idPlace'");
-
-    return $req;
 }
 
 //The first tour start, the name of the first player is saved and the first player have to play
@@ -220,8 +208,6 @@ function StartGame($idGame, $FirstPlayer)
     $dbh = ConnectDB();
     $req = $dbh->query("UPDATE fishermenland.game SET TourGame = '1', FirstPlayerGame = '$FirstPlayer' WHERE idGame = '$idGame' AND TourGame IS NULL");
     $req = $dbh->query("UPDATE fishermenland.place SET fkStatusPlace = '2' WHERE fkPlayerPlace = (SELECT idPlayer FROM fishermenland.player WHERE PseudoPlayer = '$FirstPlayer')");
-
-    return $req;
 }
 
 //Player passes her round
@@ -230,8 +216,6 @@ function PassRound($PassRound, $idPlace, $idGame)
     $dbh = ConnectDB();
     $req = $dbh->query("UPDATE fishermenland.place SET fkStatusPlace = '1' WHERE idPlace = '$idPlace'");
     $req = $dbh->query("UPDATE fishermenland.place SET fkStatusPlace = '2' WHERE fkGamePlace = '$idGame' AND OrderPlace = '$PassRound'");
-
-    return $req;
 }
 
 //Check the rank of all player and return the datas
@@ -249,8 +233,6 @@ function UpdateRank($Rank, $fkPlayerHistory)
     $dbh = ConnectDB();
     $req = $dbh->query("UPDATE fishermenland.player SET RankingPlayer = NULL");
     $req = $dbh->query("UPDATE fishermenland.player SET RankingPlayer = '$Rank' WHERE idPlayer = '$fkPlayerHistory'");
-
-    return $req;
 }
 
 //Save the game in the history
@@ -258,8 +240,6 @@ function SaveGame($idPlayer)
 {
     $dbh = ConnectDB();
     $req = $dbh->query("INSERT INTO fishermenland.history (ScoreHistory, fkPlayerHistory) VALUES ('50','$idPlayer')");
-
-    return $req;
 }
 
 //New tour is starting
@@ -267,6 +247,12 @@ function AddTour($idGame)
 {
     $dbh = ConnectDB();
     $req = $dbh->query("UPDATE fishermenland.game SET TourGame = TourGame + '1' WHERE idGame = '$idGame'");
+}
 
-    return $req;
+//Add new fishes in the pond and the Lake
+function AddNewFishes($LakeReproductionGame, $PondReproductionGame)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.game SET LakeFishesGame = FLOOR((LakeFishesGame/2))*$LakeReproductionGame+LakeFishesGame");
+    $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = FLOOR((PondFishesPlace/2))*$PondReproductionGame+PondFishesPlace");
 }

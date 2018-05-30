@@ -9,6 +9,7 @@
     </head>
     <body>
         <?= @$Error; ?>
+        <?php $Error = NULL //Prevebt to show error multiple times?>
         <?= $content ?>
     </body>
 </html>
