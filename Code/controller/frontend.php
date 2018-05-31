@@ -172,7 +172,18 @@ function GoGame($idPlace, $idGame, $Error)
         {
             if($ShowGameInfo['NextFirstPlayer'] != 'Non disponible') //Prevent to assign "Non disponible" as first user
             {
-                StartGame($idGame, $ShowGameInfo['NextFirstPlayer']); //The game has started
+                if($_SESSION['Pseudo'] == $ShowGameInfo['NextFirstPlayer'] ) //Only the first player can start the game
+                {
+                    if($ShowGameInfo['NextFirstPlayer'] == $ShowGameInfo['FirstPlayerGame']) //Doesn't allow the player to play 2 times first
+                    {
+                        ChangeOrder($idGame, $ShowGameInfo['MaxPlayersGame']);
+                        return;
+                    }
+                    else
+                    {
+                        StartGame($idGame, $ShowGameInfo['NextFirstPlayer']); //The game has started
+                    }
+                }
             }
         }
         elseif($ShowGameInfo['TourGame'] == NULL) //Tell to the players how many players are missing when the game hasn't started
@@ -182,7 +193,9 @@ function GoGame($idPlace, $idGame, $Error)
         }
         elseif($ShowGameInfo['TourGame'] >= $ShowGameInfo['SeasonTourGame'] || $ShowGameInfo['OccupedPlaces']<=1) //The game has ended
         {
-            DoDeletePlace($idPlace);
+            $Error = "Vous n'avez que 15 secondes pour recommencer une partie";
+            UpdateTourGame($idGame); //Put at 999 the TourGame. In case of the game end by 1 player leaving the game, tge game has to be able to reset
+            GoEndGame($idPlace, $idGame, $Error); //Show the scores
             return;
         }
 
@@ -205,11 +218,68 @@ function GoGame($idPlace, $idGame, $Error)
     require('view/frontend/GameView.php'); //Show the game selected by the player
 }
 
-//Delete the place and redirect to the home page. Save the game in the history
-function DoDeletePlace($IdLeavePlace)
+//Go to the page where the scores are showed, after winning or losing a game. Save the game in the history
+function GoEndGame($idPlace, $idGame, $Error)
+{
+    $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
+    $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
+
+    foreach($ShowGameInfos as $ShowGameInfo)
+    {
+        $CommonScore = $ShowGameInfo['LakeFishesGame'];
+        $CollectiveScore = $ShowGameInfo['LakeFishesGame'] + $ShowGameInfo['SumPondFishes'];
+    }
+
+    foreach($ShowPlayers as $ShowPlayer)
+    {
+        if($ShowPlayer['idPlace'] == $idPlace)
+        {
+            $IndividualScore = $ShowPlayer['PondFishesPlace'] + $CommonScore;
+        }
+    }
+    DoUpdateRank($IndividualScore);
+    require('view/frontend/EndGameView.php'); //Show the game selected by the player
+}
+
+//Delete the place, create a new place and verify if the first player on the last game was not this player
+function DoReplayGame($Pseudo, $idGame)
+{
+    $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
+    $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
+
+
+    foreach($ShowPlayers as $ShowPlayer)
+    {
+        if($ShowPlayer['PseudoPlayer'] == $Pseudo)
+        {
+            foreach($ShowGameInfos as $ShowGameInfo)
+            {
+                if($ShowGameInfo['TourGame'] >= $ShowGameInfo['SeasonTourGame']) //Allows the code to reset only one time
+                {
+                    sleep(1); //Wait1 sec before reset;
+                    DeletePlaces($idGame); //Delete all the places of this game
+                    ResetGame($idGame); //Reset the game
+                }
+            }
+        }
+    }
+    DoCreatePlace($Pseudo, $_SESSION['idGame']);
+    return;
+}
+
+//Delete the place, change place of other players and redirect to the home page
+function DoDeletePlace($IdLeavePlace, $idGame)
 {
     header('Location: index.php'); //Prevent to spam form
-    DoUpdateRank();
+    $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
+    foreach($ShowPlayers as $ShowPlayer)
+    {
+        if($ShowPlayer['idPlace'] == $IdLeavePlace)
+        {
+            ChangeOrderAfterLeave($IdLeavePlace, $idGame, $ShowPlayer['OrderPlace']);
+        }
+    }
+
     DeletePlace($IdLeavePlace);
     unset($_SESSION['$idPlace']);
     unset($_SESSION['$idGame']);
@@ -306,24 +376,26 @@ function DoPassRound($PassRound, $idPlace, $idGame)
 //Add 1 tour when it's a new tour
 function DoAddTour($NextPlayer, $idGame)
 {
-    if($NextPlayer == 0) //if the next player is 0, add a tour and fishes make new fishes
+    if($NextPlayer == 0) //if the next player is 0, add a tour and fishes make new fishes.Players hit 2 fishes
     {
+        AddTour($idGame);
         $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
 
         foreach($ShowGameInfos as $ShowGameInfo)
         {
-            if($ShowGameInfo['idGame'] == $idGame) //if this is the game who is starting a new round, give new fishes
+            if($ShowGameInfo['TourGame'] < $ShowGameInfo['SeasonTourGame']) //if this is the game who is starting a new round and this isn't the last round, give new fishes
             {
+                EatPondFishes($idGame, $ShowGameInfo['EatFishesGame']);
                 AddNewFishes($ShowGameInfo['LakeReproductionGame'], $ShowGameInfo['PondReproductionGame']);
             }
         }
-        AddTour($idGame);
     }
 }
+
 //To calculate the rank make an AVG() of all the scores grouped by the id of the player who make theses scores, and sort in ascending order. Next foreach entry give a rank with the id on the array
-function DoUpdateRank()
+function DoUpdateRank($IndividualScore)
 {
-    SaveGame($_SESSION['MyID']);
+    SaveGame($_SESSION['MyID'], $IndividualScore);
     $ListRanks = CheckRank();
     $Rank = 0;
 

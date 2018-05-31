@@ -18,6 +18,10 @@
 if(isset($idPlace))
 {
     $_SESSION['idPlace'] = $idPlace;
+}
+
+if(isset($idGame))
+{
     $_SESSION['idGame'] = $idGame;
 }
 ?>

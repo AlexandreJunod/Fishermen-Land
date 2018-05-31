@@ -3,7 +3,7 @@ session_start();
 require('controller/frontend.php');
 require('function/function.php');
 
-//error_log(print_r($_POST, 1));
+error_log(print_r($_POST, 1));
 
 try
 {
@@ -23,7 +23,7 @@ try
         }
         elseif(isset($_POST['LeaveGame'])) //The player wants to leave the game
         {
-            DoDeletePlace($_POST['LeaveGame']);
+            DoDeletePlace($_POST['LeaveGame'], $_SESSION['idGame']);
         }
         elseif(isset($_POST['NbFishing'])) //The player is fishing
         {
@@ -40,6 +40,10 @@ try
         elseif(isset($_POST['PassRound'])) //The player pass her round
         {
             DoPassRound($_POST['PassRound'], $_SESSION['idPlace'], $_SESSION['idGame']);
+        }
+        elseif(isset($_POST['ReplayGame'])) //The player want to replay the game
+        {
+            DoReplayGame($_SESSION['Pseudo'], $_SESSION['idGame']);
         }
         else //The user is logged and did nothing
         {

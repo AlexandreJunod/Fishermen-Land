@@ -165,18 +165,11 @@ function ShowInfoPlayers($idGame)
 function ShowInfoGames($idGame)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("SELECT idGame, LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, DescriptionType, (SELECT COUNT(idPlace) FROM fishermenland.place WHERE fkGamePlace = idGame) AS OccupedPlaces
+    $req = $dbh->query("SELECT idGame, LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, DescriptionType, (SELECT COUNT(idPlace) FROM fishermenland.place WHERE fkGamePlace = idGame) AS OccupedPlaces, (SELECT SUM(PondFishesPlace) FROM fishermenland.place WHERE fkGamePlace = idGame) AS SumPondFishes
     FROM fishermenland.game
     INNER JOIN fishermenland.type ON game.fkTypeGame = type.idType WHERE idGame = '$idGame'");
 
     return $req;
-}
-
-//Delete the place of the player
-function DeletePlace($IdLeavePlace)
-{
-    $dbh = ConnectDB();
-    $req = $dbh->query("DELETE FROM fishermenland.place WHERE idPlace = '$IdLeavePlace'");
 }
 
 //Fish in the lake
@@ -236,10 +229,10 @@ function UpdateRank($Rank, $fkPlayerHistory)
 }
 
 //Save the game in the history
-function SaveGame($idPlayer)
+function SaveGame($idPlayer, $IndividualScore)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("INSERT INTO fishermenland.history (ScoreHistory, fkPlayerHistory) VALUES ('50','$idPlayer')");
+    $req = $dbh->query("INSERT INTO fishermenland.history (ScoreHistory, fkPlayerHistory) VALUES ('$IndividualScore','$idPlayer')");
 }
 
 //New tour is starting
@@ -255,4 +248,53 @@ function AddNewFishes($LakeReproductionGame, $PondReproductionGame)
     $dbh = ConnectDB();
     $req = $dbh->query("UPDATE fishermenland.game SET LakeFishesGame = FLOOR((LakeFishesGame/2))*$LakeReproductionGame+LakeFishesGame");
     $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = FLOOR((PondFishesPlace/2))*$PondReproductionGame+PondFishesPlace");
+}
+
+//Reset the game
+function ResetGame($idGame)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.game SET LakeFishesGame = (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'DefaultLakeFishes'), LakeReproductionGame = (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'LakeReproduction'), PondReproductionGame = (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'PondReproduction'), EatFishesGame = (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'EatenFishes'), TourGame = NULL, SeasonTourGame = (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'SeasonTour'), MaxPlayersGame = (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'MaxPlayers'), MaxReleaseGame = (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'ReleaseMax') WHERE idGame = '$idGame'");
+}
+
+//Delete the place of the player
+function DeletePlace($idPlace)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("DELETE FROM fishermenland.place WHERE idPlace = '$idPlace'");
+}
+
+//Delete all the players on a game
+function DeletePlaces($idGame)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("DELETE FROM fishermenland.place WHERE fkGamePlace = '$idGame'");
+}
+
+//Change the order of all players
+function ChangeOrder($idGame, $MaxPlayers)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.place SET OrderPlace = (OrderPlace +1)%$MaxPlayers WHERE fkGamePlace = '$idGame'");
+}
+
+//Change the order of all players playing after the player leaving
+function ChangeOrderAfterLeave($idPlace, $idGame, $OrderPlace)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.place SET OrderPlace = OrderPlace - 1 WHERE OrderPlace > $OrderPlace AND fkGamePlace ='$idGame'");
+}
+
+//Put TourGame at 999
+function UpdateTourGame($idGame)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.game SET TourGame = '999' WHERE idGame = '$idGame'");
+}
+
+//Eat fishes
+function EatPondFishes($idGame, $FishesToEat)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = PondFishesPlace - $FishesToEat WHERE fkGamePlace = '$idGame'");
 }

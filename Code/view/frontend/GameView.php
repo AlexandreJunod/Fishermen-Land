@@ -1,8 +1,6 @@
 <?php $title = 'Fishermen Land'; ?>
 
-<?php ob_start();
-$SumFishes = 0; //Variable to count the nomber total of fishes
-?>
+<?php ob_start();?>
 
 <!-- Show players -->
 <h3>Fishermen Land</h3>
@@ -23,10 +21,6 @@ $SumFishes = 0; //Variable to count the nomber total of fishes
         foreach ($ShowPlayer as $key => $value)
         {
             echo "<td>".$value."</td>";
-            if($key == "PondFishesPlace") //Count the nomber total of fishes
-            {
-                $SumFishes += $value;
-            }
         }
         echo "</tr>";
     } ?>
@@ -52,6 +46,7 @@ $SumFishes = 0; //Variable to count the nomber total of fishes
         <td>Action</td>
         <td>Prochain joueur</td>
         <td>Futur premier joueur</td>
+        <td>Poissons totaux des etangs</td>
     </tr>
     <?php foreach($ShowGameInfos as $ShowGameInfo) //Reading each row of the table
     {
@@ -59,10 +54,7 @@ $SumFishes = 0; //Variable to count the nomber total of fishes
         foreach ($ShowGameInfo as $key => $value)
         {
             echo "<td>".$value."</td>";
-            if($key == "LakeFishesGame") //Count the nomber total of fishes
-            {
-                $SumFishes += $value;
-            }
+            $SumFishes = $ShowGameInfo['SumPondFishes'] + $ShowGameInfo['LakeFishesGame'];
         }
     }
     ?>
