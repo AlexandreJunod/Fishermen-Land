@@ -176,16 +176,16 @@ function ShowInfoGames($idGame)
 function Fish($NbFishing, $idPlace, $idGame)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = PondFishesPlace + '$NbFishing', FishedFishesPlace = FishedFishesPlace + '$NbFishing' WHERE idPlace = '$idPlace'");
-    $req = $dbh->query("UPDATE fishermenland.game SET LakeFishesGame = LakeFishesGame - '$NbFishing' WHERE idGame = '$idGame'");
+    $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = PondFishesPlace + CEILING($NbFishing), FishedFishesPlace = FishedFishesPlace + CEILING($NbFishing) WHERE idPlace = '$idPlace'");
+    $req = $dbh->query("UPDATE fishermenland.game SET LakeFishesGame = LakeFishesGame - CEILING($NbFishing) WHERE idGame = '$idGame'");
 }
 
 //Release fishes from the pond
 function Release($NbReleasing, $idPlace, $idGame)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = PondFishesPlace - '$NbReleasing', ReleasedFishesPlace = ReleasedFishesPlace + '$NbReleasing' WHERE idPlace = '$idPlace'");
-    $req = $dbh->query("UPDATE fishermenland.game SET LakeFishesGame = LakeFishesGame + '$NbReleasing' WHERE idGame = '$idGame'");
+    $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = PondFishesPlace - CEILING($NbReleasing), ReleasedFishesPlace = ReleasedFishesPlace + CEILING($NbReleasing) WHERE idPlace = '$idPlace'");
+    $req = $dbh->query("UPDATE fishermenland.game SET LakeFishesGame = LakeFishesGame + CEILING($NbReleasing) WHERE idGame = '$idGame'");
 }
 
 //Change the status from "Joue" in "Relâche des poissons"
@@ -224,7 +224,7 @@ function CheckRank()
 function UpdateRank($Rank, $fkPlayerHistory)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("UPDATE fishermenland.player SET RankingPlayer = NULL");
+    //$req = $dbh->query("UPDATE fishermenland.player SET RankingPlayer = NULL");
     $req = $dbh->query("UPDATE fishermenland.player SET RankingPlayer = '$Rank' WHERE idPlayer = '$fkPlayerHistory'");
 }
 
@@ -297,4 +297,21 @@ function EatPondFishes($idGame, $FishesToEat)
 {
     $dbh = ConnectDB();
     $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = PondFishesPlace - $FishesToEat WHERE fkGamePlace = '$idGame'");
+}
+
+//Get the best score of 1 player
+function GetBestScore($idPlayer)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("SELECT idHistory, ScoreHistory FROM fishermenland.history WHERE fkPlayerHistory = '$idPlayer' ORDER BY ScoreHistory ASC LIMIT 1");
+    $reqArray = $req->fetch();
+
+    return $reqArray;
+}
+
+//Put the status of the player on "Eliminé" and drop the fishes
+function LostGame($idPlace)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = '0' AND fkStatusPlace = '4' WHERE idPlace = '$idPlace'");
 }

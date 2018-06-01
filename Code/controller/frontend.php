@@ -17,6 +17,7 @@ function DoLogin($Pseudo, $Password)
             if($PasswordPlayer == $HashPassword) //Check if the password gived by the user is the same than the password hashed of the data base
             {
                 AccessAccepted($Pseudo, $idPlayer);
+                header('Location: index.php'); //Prevent to send mutliple times the form
                 return;
             }
             else
@@ -54,6 +55,7 @@ function DoSignup($Pseudo, $Password)
         {
             Signup($Pseudo, $Password); //Create the account
             DoLogin($Pseudo, $Password); //Login the player
+            header('Location: index.php'); //Prevent to send mutliple times the form
             return;
         }
     }
@@ -71,17 +73,23 @@ function GoHome($Pseudo, $Error)
         $ShowGames = array(); //Create the array for informations about the games
         foreach($ListGames as $ListGame)
         {
-            if($ListGame['TourGame'] == NULL || $ListGame['TourGame'] == 0) //Check if the game has started, the gane would be joignable
+            if($ListGame['TourGame'] == NULL || $ListGame['TourGame'] == 0) //Check if the game has started, the game would be joignable
             {
                 //Put the datas in the array $ShowGames
                 array_push($ShowGames, array('idGame' => $ListGame['idGame'], 'LakeFishesGame' => $ListGame['LakeFishesGame'], 'LakeReproductionGame' => $ListGame['LakeReproductionGame'], 'PondReproductionGame' => $ListGame['PondReproductionGame'], 'EatFishesGame' => $ListGame['EatFishesGame'], 'FirstPlayerGame' => $ListGame['FirstPlayerGame'], 'TourGame' => $ListGame['TourGame'], 'SeasonTourGame' => $ListGame['SeasonTourGame'], 'MaxPlayersGame' => $ListGame['MaxPlayersGame'], 'MaxReleaseGame' => $ListGame['MaxReleaseGame'], 'DescriptionType' => $ListGame['DescriptionType'], 'OccupedPlaces' => $ListGame['OccupedPlaces'], 'UsedPlaces' => $ListGame['OccupedPlaces'].'/'.$ListGame['MaxPlayersGame'], 'Status' => 'En attente', 'CanJoin' => 'Yes'));
             }
-            else //The game has started and is injoignable
+            else //The game has started and is unreachable
             {
                 //Put the datas in the array $ShowGames
                 array_push($ShowGames, array('idGame' => $ListGame['idGame'], 'LakeFishesGame' => $ListGame['LakeFishesGame'], 'LakeReproductionGame' => $ListGame['LakeReproductionGame'], 'PondReproductionGame' => $ListGame['PondReproductionGame'], 'EatFishesGame' => $ListGame['EatFishesGame'], 'FirstPlayerGame' => $ListGame['FirstPlayerGame'], 'TourGame' => $ListGame['TourGame'], 'SeasonTourGame' => $ListGame['SeasonTourGame'], 'MaxPlayersGame' => $ListGame['MaxPlayersGame'], 'MaxReleaseGame' => $ListGame['MaxReleaseGame'], 'DescriptionType' => $ListGame['DescriptionType'], 'OccupedPlaces' => $ListGame['OccupedPlaces'], 'UsedPlaces' => $ListGame['OccupedPlaces'].'/'.$ListGame['MaxPlayersGame'], 'Status' => 'En cours', 'CanJoin' => 'No'));
+
+                if($ListGame['OccupedPlaces'] == 0) //The game can't be unreachable and get 0 players. The game is automatically reset
+                {
+                    ResetGame($ListGame['idGame']);
+                }
             }
         }
+        ?><script>setInterval(function(){location.reload()},3000);</script><?php // Refresh the page
         require('view/frontend/HomeView.php');
 
         $InfoAdmin = CheckAdmin($Pseudo); //Check if the player is an admin
@@ -90,7 +98,7 @@ function GoHome($Pseudo, $Error)
             require('view/frontend/AdminView.php'); //Show the button to go on the settings page
         }
     }
-    else
+    else //The player has a place
     {
         extract($GetIdCreatedPlace); //$idPlace, $fkGamePlace
         GoGame($idPlace, $fkGamePlace, $Error);
@@ -208,6 +216,15 @@ function GoGame($idPlace, $idGame, $Error)
                 case 'Relâche des poissons':
                     require('view/frontend/GameReleasingView.php'); //Show the buttons for releasing
                     break;
+                case 'Eliminé':
+                    foreach($ShowPlayers as $ShowPlayer)
+                    {
+                        if($ShowPlayer['idPlace'] == $idPlace)
+                        {
+                            DoPassRound($ShowPlayer['OrderPlace'], $idPlace, $idGame);
+                        }
+                    }
+                    break;
             }
         }
         else //The player isn't playing
@@ -272,11 +289,21 @@ function DoDeletePlace($IdLeavePlace, $idGame)
 {
     header('Location: index.php'); //Prevent to spam form
     $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
-    foreach($ShowPlayers as $ShowPlayer)
+    $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
+
+    foreach($ShowPlayers as $ShowPlayer) //Change the order of all player playing after the player who leaves
     {
         if($ShowPlayer['idPlace'] == $IdLeavePlace)
         {
             ChangeOrderAfterLeave($IdLeavePlace, $idGame, $ShowPlayer['OrderPlace']);
+        }
+    }
+
+    foreach($ShowGameInfos as $ShowGameInfo) //Reset game if there is only 1 player on the game
+    {
+        if($ShowGameInfo['OccupedPlaces'] == 1)
+        {
+            ResetGame($idGame);
         }
     }
 
@@ -349,6 +376,7 @@ function DoPassRound($PassRound, $idPlace, $idGame)
     $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
     $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
 
+
     foreach($ShowGameInfos as $ShowGameInfo)
     {
         if($ShowGameInfo['idGame'] == $idGame)
@@ -361,9 +389,18 @@ function DoPassRound($PassRound, $idPlace, $idGame)
                     {
                         ChangeStatusRelease($idPlace);
                     }
-                    else //The player haven't to drop fishes
+                    else
                     {
-                        DoAddTour($ShowGameInfo['NextPlayer'], $idGame);
+                        $AmountToRelease = ($ShowPlayer['PondFishesPlace']/100)*10; //Amount to release automatically (10%)
+                        if($ShowGameInfo['DescriptionType'] == 'Imposition avec forfait' && $ShowPlayer['DescriptionStatus'] == 'Joue') //10% of the fishes will be drop, but can't release more than the limit fixed by the admin
+                        {
+                            if($AmountToRelease > $ShowGameInfo['MaxReleaseGame'])
+                            {
+                                $AmountToRelease = $ShowGameInfo['MaxReleaseGame'];
+                            }
+                        }
+                        Release($AmountToRelease, $idPlace, $idGame);
+                        DoAddTour($ShowGameInfo['NextPlayer'], $idGame, $idPlace);
                         PassRound($PassRound, $idPlace, $idGame);
                     }
                 }
@@ -374,19 +411,33 @@ function DoPassRound($PassRound, $idPlace, $idGame)
 }
 
 //Add 1 tour when it's a new tour
-function DoAddTour($NextPlayer, $idGame)
+function DoAddTour($NextPlayer, $idGame, $idPlace)
 {
     if($NextPlayer == 0) //if the next player is 0, add a tour and fishes make new fishes.Players hit 2 fishes
     {
         AddTour($idGame);
         $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
+        $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
 
         foreach($ShowGameInfos as $ShowGameInfo)
         {
             if($ShowGameInfo['TourGame'] < $ShowGameInfo['SeasonTourGame']) //if this is the game who is starting a new round and this isn't the last round, give new fishes
             {
-                EatPondFishes($idGame, $ShowGameInfo['EatFishesGame']);
-                AddNewFishes($ShowGameInfo['LakeReproductionGame'], $ShowGameInfo['PondReproductionGame']);
+                foreach($ShowPlayers as $ShowPlayer)
+                {
+                    if($ShowPlayer['idPlace'] == $idPlace) //select the right player
+                    {
+                        if($ShowPlayer['PondFishesPlace'] > $ShowGameInfo['EatFishesGame']) //Verify if the player can survive this round
+                        {
+                            EatPondFishes($idGame, $ShowGameInfo['EatFishesGame']);
+                            AddNewFishes($ShowGameInfo['LakeReproductionGame'], $ShowGameInfo['PondReproductionGame']);
+                        }
+                        else //Drop all the fishes and lose the game, he can watch the end of the game
+                        {
+                            LostGame($idPlace);
+                        }
+                    }
+                }
             }
         }
     }
@@ -395,14 +446,23 @@ function DoAddTour($NextPlayer, $idGame)
 //To calculate the rank make an AVG() of all the scores grouped by the id of the player who make theses scores, and sort in ascending order. Next foreach entry give a rank with the id on the array
 function DoUpdateRank($IndividualScore)
 {
-    SaveGame($_SESSION['MyID'], $IndividualScore);
     $ListRanks = CheckRank();
-    $Rank = 0;
+    $BestScore = GetBestScore($_SESSION['MyID']);
+    if($BestScore != NULL)
+    {
+        extract($BestScore); //$idHistory, $ScoreHistory
+        if($IndividualScore >  $ScoreHistory) //Save the game twice if the best score was defeated
+        {
+            SaveGame($_SESSION['MyID'], $IndividualScore);
+        }
+    }
 
-    //$ArrayWithRanks = array(); //Create the array for keep the ranks and a number
+    SaveGame($_SESSION['MyID'], $IndividualScore);
+    $Rank = 1;
+
     foreach($ListRanks as $ListRanks)
     {
-        $Rank++;
         UpdateRank($Rank, $ListRanks['fkPlayerHistory']); //Change the rank of all players
+        $Rank++;
     }
 }
