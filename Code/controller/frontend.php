@@ -62,13 +62,27 @@ function DoSignup($Pseudo, $Password)
     require('view/frontend/SignupView.php');
 }
 
+//Disconnect the player and goes to the connexion page
+function DoDisconnect()
+{
+    $Error = "Déconnexion réussie"; //Variable to show the message
+    unset($_SESSION['Pseudo']); //Dont let the session start
+    unset($Pseudo); //Dont let the session start;
+    require('view/frontend/LoginView.php');
+}
+
 //List the games
 function GoHome($Pseudo, $Error)
 {
+    $Rank = GetRank($Pseudo);
+    extract($Rank); //$RankingPlayer
+
     $GetIdCreatedPlace = IdCreatedPlace($Pseudo);
     if($GetIdCreatedPlace == NULL) //The player isn't assigned to a place
     {
+        DoCreateAndDeleteGame();
         $ListGames = GetListGames(); //List all the games
+        $AllowDisconnect = '1'; //Allow the player to disconnect
 
         $ShowGames = array(); //Create the array for informations about the games
         foreach($ListGames as $ListGame)
@@ -100,9 +114,58 @@ function GoHome($Pseudo, $Error)
     }
     else //The player has a place
     {
+        $AllowDisconnect = '0'; //Disalow the player to disconnect because he is in a game
+
         extract($GetIdCreatedPlace); //$idPlace, $fkGamePlace
         GoGame($idPlace, $fkGamePlace, $Error);
     }
+    require('view/frontend/InfoPlayerView.php');
+}
+
+//Create games, to have each type of game playable. Delete places if there is too much empty games
+function DoCreateAndDeleteGame()
+{
+    //Get how many games are empty of each type and how many are not empty and the total of games
+    $Cooperative = GetCooperative();
+    $Impostion = GetImpostion();
+    $ImpostionForfait = GetImpostionForfait();
+
+    //Create or delete "Cooperatif" games
+    extract($Cooperative); //$Joignable, $NotEmpty, $TotalGames
+    $Empty = $TotalGames - $NotEmpty; //Count how many empty games there is
+    if($Joignable == 0)
+    {
+        CreateCooperative();
+    }
+    elseif($Empty > 3) //Delete if there is more than 3 empty games
+    {
+        DeleteCooperative();
+    }
+
+    //Create or delete "Imposition" games
+    extract($Impostion); //$Joignable, $NotEmpty, $TotalGames
+    $Empty = $TotalGames - $NotEmpty; //Count how many empty games there is
+    if($Joignable == 0)
+    {
+        CreateImpostion();
+    }
+    elseif($Empty > 3) //Delete if there is more than 3 empty games
+    {
+        DeleteImpostion();
+    }
+
+    //Create or delete "Imposition avec forfait" games
+    extract($ImpostionForfait); //$Joignable, $NotEmpty, $TotalGames
+    $Empty = $TotalGames - $NotEmpty; //Count how many empty games there is
+    if($Joignable == 0)
+    {
+        CreateImpostionForfait();
+    }
+    elseif($Empty > 3) //Delete if there is more than 3 empty games
+    {
+        DeleteImpostionForfait();
+    }
+    return;
 }
 
 //List all the settings
@@ -185,12 +248,9 @@ function GoGame($idPlace, $idGame, $Error)
                     if($ShowGameInfo['NextFirstPlayer'] == $ShowGameInfo['FirstPlayerGame']) //Doesn't allow the player to play 2 times first
                     {
                         ChangeOrder($idGame, $ShowGameInfo['MaxPlayersGame']);
-                        return;
                     }
-                    else
-                    {
-                        StartGame($idGame, $ShowGameInfo['NextFirstPlayer']); //The game has started
-                    }
+
+                    StartGame($idGame, $ShowGameInfo['NextFirstPlayer']); //The game has started
                 }
             }
         }
@@ -215,15 +275,6 @@ function GoGame($idPlace, $idGame, $Error)
                     break;
                 case 'Relâche des poissons':
                     require('view/frontend/GameReleasingView.php'); //Show the buttons for releasing
-                    break;
-                case 'Eliminé':
-                    foreach($ShowPlayers as $ShowPlayer)
-                    {
-                        if($ShowPlayer['idPlace'] == $idPlace)
-                        {
-                            DoPassRound($ShowPlayer['OrderPlace'], $idPlace, $idGame);
-                        }
-                    }
                     break;
             }
         }
@@ -376,32 +427,32 @@ function DoPassRound($PassRound, $idPlace, $idGame)
     $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
     $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
 
-
     foreach($ShowGameInfos as $ShowGameInfo)
     {
         if($ShowGameInfo['idGame'] == $idGame)
         {
             foreach($ShowPlayers as $ShowPlayer) //Take the infos about the players
             {
-                if($ShowPlayer['idPlace'] == $idPlace)
+                if($ShowPlayer['idPlace'] == $idPlace) //Select the correct id
                 {
-                    if($ShowGameInfo['DescriptionType'] == 'Coopératif' && $ShowPlayer['DescriptionStatus'] == 'Joue') //If game is on cooperative, player will have to select an amount of fishes to drop
+                    if($ShowGameInfo['DescriptionType'] == 'Coopératif' && $ShowPlayer['DescriptionStatus'] == 'Joue') //If the game is on cooperative, player will have to select an amount of fishes to drop
                     {
                         ChangeStatusRelease($idPlace);
                     }
-                    else
+                    else //The amount of fishes to drop is automatically set
                     {
-                        $AmountToRelease = ($ShowPlayer['PondFishesPlace']/100)*10; //Amount to release automatically (10%)
-                        if($ShowGameInfo['DescriptionType'] == 'Imposition avec forfait' && $ShowPlayer['DescriptionStatus'] == 'Joue') //10% of the fishes will be drop, but can't release more than the limit fixed by the admin
+                        if($ShowGameInfo['DescriptionType'] == 'Imposition' || $ShowGameInfo['DescriptionType'] == 'Imposition avec forfait') //10% of the fishes will be drop, but can't release more than the limit fixed by the admin if it's "Imposition avec forfait"
                         {
-                            if($AmountToRelease > $ShowGameInfo['MaxReleaseGame'])
+                            $AmountToRelease = ($ShowPlayer['PondFishesPlace']/100)*10; //Amount to release automatically (10%)
+                            if($AmountToRelease > $ShowGameInfo['MaxReleaseGame'] && $ShowGameInfo['DescriptionType'] == 'Imposition avec forfait')
                             {
                                 $AmountToRelease = $ShowGameInfo['MaxReleaseGame'];
                             }
+                            Release($AmountToRelease, $idPlace, $idGame);
                         }
-                        Release($AmountToRelease, $idPlace, $idGame);
+                        PassRound($PassRound, $idGame, $idPlace);
                         DoAddTour($ShowGameInfo['NextPlayer'], $idGame, $idPlace);
-                        PassRound($PassRound, $idPlace, $idGame);
+                        CheckIfCanSurvive($idGame, $idPlace);
                     }
                 }
             }
@@ -410,33 +461,57 @@ function DoPassRound($PassRound, $idPlace, $idGame)
     GoGame($idPlace, $idGame, NULL);
 }
 
-//Add 1 tour when it's a new tour
+//Add 1 tour when it's a new tour. Give new fishes and eat
 function DoAddTour($NextPlayer, $idGame, $idPlace)
 {
-    if($NextPlayer == 0) //if the next player is 0, add a tour and fishes make new fishes.Players hit 2 fishes
-    {
-        AddTour($idGame);
-        $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
-        $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
+    $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
+    $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
 
-        foreach($ShowGameInfos as $ShowGameInfo)
+    foreach($ShowPlayers as $ShowPlayer)
+    {
+        if($ShowPlayer['idPlace'] == $idPlace) //select the right player
         {
-            if($ShowGameInfo['TourGame'] < $ShowGameInfo['SeasonTourGame']) //if this is the game who is starting a new round and this isn't the last round, give new fishes
+            if($NextPlayer < $ShowPlayer['OrderPlace']) //if the next player has an order smaller, it's a new tour
             {
-                foreach($ShowPlayers as $ShowPlayer)
+                AddTour($idGame);
+
+                foreach($ShowGameInfos as $ShowGameInfo)
                 {
-                    if($ShowPlayer['idPlace'] == $idPlace) //select the right player
+                    if($ShowGameInfo['TourGame'] < $ShowGameInfo['SeasonTourGame']) //If all the tours have not been played yet, we can Eat fishes and make new fishes
                     {
-                        if($ShowPlayer['PondFishesPlace'] > $ShowGameInfo['EatFishesGame']) //Verify if the player can survive this round
+                        if($ShowPlayer['PondFishesPlace'] == 0) //Prevent to get negative values, with eliminated players
                         {
                             EatPondFishes($idGame, $ShowGameInfo['EatFishesGame']);
-                            AddNewFishes($ShowGameInfo['LakeReproductionGame'], $ShowGameInfo['PondReproductionGame']);
-                        }
-                        else //Drop all the fishes and lose the game, he can watch the end of the game
-                        {
-                            LostGame($idPlace);
                         }
                     }
+                }
+                AddNewFishes($ShowGameInfo['LakeReproductionGame'], $ShowGameInfo['PondReproductionGame']);
+            }
+            elseif($NextPlayer == $ShowPlayer['OrderPlace']) //If the next player is the same, the game has ended
+            {
+                UpdateTourGame($idGame); //Put at 999 the TourGame. To make the game end
+            }
+        }
+    }
+}
+
+//Check if the player can survive
+function CheckIfCanSurvive($idGame, $idPlace)
+{
+    $ShowGameInfos = GetShowGameInfos($idGame); //Get the array $ShowGameInfos
+    $ShowPlayers = GetShowPlayers($idGame); //Get the array $ShowPlayers
+
+    foreach($ShowGameInfos as $ShowGameInfo)
+    {
+        foreach($ShowPlayers as $ShowPlayer)
+        {
+            if($ShowPlayer['idPlace'] == $idPlace) //Check if i'm looking the pond of right player
+            {
+                //Check how many meat we need to survive, and eliminate the players who can't survive
+                $NecessaryMeat = $ShowGameInfo['EatFishesGame'] + 1;
+                if($ShowPlayer['PondFishesPlace'] < $NecessaryMeat) //Verify if the player can survive this round
+                {
+                    LostGame($idPlace);
                 }
             }
         }

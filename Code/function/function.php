@@ -39,7 +39,7 @@ function GetShowGameInfos($idGame)
         if($ShowPlayer['DescriptionStatus'] == 'Joue' || $ShowPlayer['DescriptionStatus'] == 'Relâche des poissons') //Select the player who is playing
         {
             $CurrentPlayer = $ShowPlayer['PseudoPlayer'];
-            $idCurrentPlayer = $ShowPlayer['OrderPlace'];
+            $idPlaceCurrentPlayer = $ShowPlayer['OrderPlace'];
             $StatusPlayer = $ShowPlayer['DescriptionStatus'];
         }
     }
@@ -49,8 +49,31 @@ function GetShowGameInfos($idGame)
     {
         if(isset($CurrentPlayer)) //Select the number of the next player who plays
         {
+            $NextPlayer = ($idPlaceCurrentPlayer + 1) % $InfoGame['OccupedPlaces'];
+            foreach($ShowPlayers as $ShowPlayer)
+            {
+                if($ShowPlayer['OrderPlace'] == $NextPlayer) //Select the next player
+                {
+                    if($ShowPlayer['DescriptionStatus'] == 'Eliminé') //Check if he is "Eliminé"
+                    {
+                        $NextPlayer = ($NextPlayer + 1) % $InfoGame['OccupedPlaces']; //Do +1 to the order, everytime we select a player who is eliminated
+                    }
+                }
+            }
+
+            foreach($ShowPlayers as $ShowPlayer)
+            {
+                if($ShowPlayer['OrderPlace'] == $NextPlayer && $NextPlayer == 0) //Dont let the first player come back in the game, if he is eliminated
+                {
+                    if($ShowPlayer['DescriptionStatus'] == 'Eliminé') //Check if he is "Eliminé"
+                    {
+                        $NextPlayer = $idPlaceCurrentPlayer; //The only player in game, is the player who is playing
+                    }
+                }
+            }
+
             //Put the datas in the array $ShowGames
-            array_push($ShowGameInfos, array('idGame' =>  $InfoGame['idGame'],'LakeFishesGame' => $InfoGame['LakeFishesGame'], 'LakeReproductionGame' => $InfoGame['LakeReproductionGame'], 'PondReproductionGame' => $InfoGame['PondReproductionGame'], 'EatFishesGame' => $InfoGame['EatFishesGame'], 'FirstPlayerGame' => $InfoGame['FirstPlayerGame'], 'TourGame' => $InfoGame['TourGame'], 'SeasonTourGame' => $InfoGame['SeasonTourGame'], 'MaxPlayersGame' => $InfoGame['MaxPlayersGame'], 'MaxReleaseGame' => $InfoGame['MaxReleaseGame'], 'DescriptionType' => $InfoGame['DescriptionType'], 'OccupedPlaces' => $InfoGame['OccupedPlaces'], 'CurrentPlayer' => $CurrentPlayer, 'Action' => $StatusPlayer, 'NextPlayer' => ($idCurrentPlayer + 1) % $InfoGame['MaxPlayersGame'], 'NextFirstPlayer' => 'Non disponible', 'SumPondFishes' => $InfoGame['SumPondFishes']));
+            array_push($ShowGameInfos, array('idGame' =>  $InfoGame['idGame'],'LakeFishesGame' => $InfoGame['LakeFishesGame'], 'LakeReproductionGame' => $InfoGame['LakeReproductionGame'], 'PondReproductionGame' => $InfoGame['PondReproductionGame'], 'EatFishesGame' => $InfoGame['EatFishesGame'], 'FirstPlayerGame' => $InfoGame['FirstPlayerGame'], 'TourGame' => $InfoGame['TourGame'], 'SeasonTourGame' => $InfoGame['SeasonTourGame'], 'MaxPlayersGame' => $InfoGame['MaxPlayersGame'], 'MaxReleaseGame' => $InfoGame['MaxReleaseGame'], 'DescriptionType' => $InfoGame['DescriptionType'], 'OccupedPlaces' => $InfoGame['OccupedPlaces'], 'CurrentPlayer' => $CurrentPlayer, 'Action' => $StatusPlayer, 'NextPlayer' => $NextPlayer, 'NextFirstPlayer' => 'Non disponible', 'SumPondFishes' => $InfoGame['SumPondFishes']));
         }
         else //We can't get the next player who plays yet
         {

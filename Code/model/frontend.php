@@ -66,6 +66,88 @@ function GetListGames()
     return $req;
 }
 
+//Get the joignable and not empty "Coopératif" games and the total of games
+function GetCooperative()
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("SELECT COUNT(idGame) AS Joignable, (SELECT COUNT(DISTINCT idGame) FROM fishermenland.game INNER JOIN fishermenland.place ON game.idGame = place.fkGamePlace WHERE fkTypeGame = '1' GROUP BY fkTypeGame) AS NotEmpty, (SELECT COUNT(idGame) FROM fishermenland.game WHERE fkTypeGame = '1') AS TotalGames FROM fishermenland.game WHERE fkTypeGame = '1' AND TourGame IS NULL");
+    $reqArray = $req->fetch();
+
+    return $reqArray;
+}
+
+//Get the joignable and not empty "Imposition" games and the total of games
+function GetImpostion()
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("SELECT COUNT(idGame) AS Joignable, (SELECT COUNT(DISTINCT idGame) FROM fishermenland.game INNER JOIN fishermenland.place ON game.idGame = place.fkGamePlace WHERE fkTypeGame = '2' GROUP BY fkTypeGame) AS NotEmpty, (SELECT COUNT(idGame) FROM fishermenland.game WHERE fkTypeGame = '2') AS TotalGames FROM fishermenland.game WHERE fkTypeGame = '2' AND TourGame IS NULL");
+    $reqArray = $req->fetch();
+
+    return $reqArray;
+}
+
+//Get the joignable and not empty "Imposition avec frofait" games and the total of games
+function GetImpostionForfait()
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("SELECT COUNT(idGame) AS Joignable, (SELECT COUNT(DISTINCT idGame) FROM fishermenland.game INNER JOIN fishermenland.place ON game.idGame = place.fkGamePlace WHERE fkTypeGame = '3' GROUP BY fkTypeGame) AS NotEmpty, (SELECT COUNT(idGame) FROM fishermenland.game WHERE fkTypeGame = '3') AS TotalGames FROM fishermenland.game WHERE fkTypeGame = '3' AND TourGame IS NULL");
+    $reqArray = $req->fetch();
+
+    return $reqArray;
+}
+
+//Create a "Coopératif" game
+function CreateCooperative()
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ((SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'DefaultLakeFishes'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'LakeReproduction'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'PondReproduction'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'EatenFishes'), NULL, NULL, (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'SeasonTour'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'MaxPlayers'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'ReleaseMax'), '1')");
+}
+
+//Create a "Imposition" game
+function CreateImpostion()
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ((SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'DefaultLakeFishes'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'LakeReproduction'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'PondReproduction'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'EatenFishes'), NULL, NULL, (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'SeasonTour'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'MaxPlayers'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'ReleaseMax'), '2')");
+}
+
+//Create a "Imposition avec forfait" game
+function CreateImpostionForfait()
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("INSERT INTO fishermenland.game (LakeFishesGame, LakeReproductionGame, PondReproductionGame, EatFishesGame, FirstPlayerGame, TourGame, SeasonTourGame, MaxPlayersGame, MaxReleaseGame, fkTypeGame) VALUES ((SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'DefaultLakeFishes'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'LakeReproduction'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'PondReproduction'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'EatenFishes'), NULL, NULL, (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'SeasonTour'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'MaxPlayers'), (SELECT ValueInt FROM fishermenland.settings WHERE NameSettings = 'ReleaseMax'), '3')");
+}
+
+//Delete a "Coopératif" game
+function DeleteCooperative()
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("DELETE FROM fishermenland.game WHERE idGame IN (SELECT idGame FROM (SELECT idGame FROM fishermenland.game WHERE fkTypeGame = '1' GROUP BY idGame DESC LIMIT 1) temp)");
+}
+
+//Delete a "Imposition" game
+function DeleteImpostion()
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("DELETE FROM fishermenland.game WHERE idGame IN (SELECT idGame FROM (SELECT idGame FROM fishermenland.game WHERE fkTypeGame = '2' GROUP BY idGame DESC LIMIT 1) temp)");
+}
+
+//Delete a "Imposition avec forfait" game
+function DeleteImpostionForfait()
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("DELETE FROM fishermenland.game WHERE idGame IN (SELECT idGame FROM (SELECT idGame FROM fishermenland.game WHERE fkTypeGame = '3' GROUP BY idGame DESC LIMIT 1) temp)");
+}
+
+//Get the rank
+function GetRank($Pseudo)
+{
+    $dbh = ConnectDB();
+    $req = $dbh->query("SELECT RankingPlayer FROM fishermenland.player WHERE PseudoPlayer = '$Pseudo'");
+    $reqArray = $req->fetch();
+
+    return $reqArray;
+}
+
 //Get the list of the settings who could be changed
 function GetListSettings()
 {
@@ -203,8 +285,9 @@ function StartGame($idGame, $FirstPlayer)
     $req = $dbh->query("UPDATE fishermenland.place SET fkStatusPlace = '2' WHERE fkPlayerPlace = (SELECT idPlayer FROM fishermenland.player WHERE PseudoPlayer = '$FirstPlayer')");
 }
 
-//Player passes her round
-function PassRound($PassRound, $idPlace, $idGame)
+//Step 1 : The player is set to "En attente"
+//Step 2 : The next player can play
+function PassRound($PassRound, $idGame, $idPlace)
 {
     $dbh = ConnectDB();
     $req = $dbh->query("UPDATE fishermenland.place SET fkStatusPlace = '1' WHERE idPlace = '$idPlace'");
@@ -313,5 +396,5 @@ function GetBestScore($idPlayer)
 function LostGame($idPlace)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = '0' AND fkStatusPlace = '4' WHERE idPlace = '$idPlace'");
+    $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = '0', fkStatusPlace = '4' WHERE idPlace = '$idPlace'");
 }

@@ -1,8 +1,184 @@
+/*--====================================================================================================================
+||  Author : Junod Alexandre                                                                                           ||
+||  Creation : 05.06.2018                                                                                              ||
+||  Summary : All the divs for the different pages of the fisherman land                                                 ||
+||====================================================================================================================-*/
+
+/********** Divs for the login and signup and home pages **********/
+
+/* Encompasses other divs and center in the middle of the page */
+.ContainerCenter{
+    width: 400px;
+    height: 350px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+
+    /* Center the div in the middle of the page */
+    position:absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+/* Contains the text above the form*/
+.Title{
+    font-family: "Arial Black", Gadget, sans-serif;
+    font-size: 35px;
+    text-align: center;
+
+    display: block;
+    width:100%;
+    height:15%;
+}
+
+/* Contains the border of the form */
+.FormDesign{
+    border: 2px solid;
+    border-radius: 20px;
+    box-shadow: 0px 0px 6px 3px #ccc;
+
+    display: block;
+    width:100%;
+    height:75%;
+}
+
+/* Contains the input fields */
+.FormFields{
+    text-align: left;
+
+    display: block;
+    width:70%;
+    height:60%;
+    margin: auto;
+    padding-top: 15%;
+}
+
+/* Contains the button */
+.FormButton{
+    text-align: center;
+
+    display: block;
+    width:100%;
+    height:10%;
+    margin: auto;
+    clear: left;
+}
+
+/* Contains the links */
+.FormLink{
+    text-align: center;
+
+    display: block;
+    width:100%;
+    height:10%;
+    padding-top: 30px;
+}
+
+/********** Layout for the error messages **********/
+
+.ErrorMsg{
+    position: sticky;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 25px;
+    color: red;
+
+    /* Center the div at the middle of the screen, 20 pixels lower than the top of the screen */
+    position:absolute;
+    width: 99%;
+    padding-top: 20px;
+    text-align: center;
+}
+
+
+/********** Divs for the home page **********/
+
+/* Encompasses other divs and center in the middle of the page */
+.ContainerCenterHome{
+    width: 35%;
+    height: 70%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+
+    /* Center the div in the middle of the page */
+    position:absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+/* Contains the div were the games are showed */
+.HomeBorder{
+    border: 2px solid;
+    box-shadow: 0px 0px 6px 3px #ccc;
+
+    display: block;
+    width:100%;
+    height:75%;
+    overflow:scroll;
+    overflow-x:hidden;
+}
+
+/* Div to show the parameters button */
+.ContainerAdminView{
+    
+}
+
+/********** Divs for show the infos about the player **********/
+
+/* Encompasses other divs */
+.ContainerInfoPlayer{
+    border: 2px solid;
+    box-shadow: 0px 0px 6px 3px #ccc;
+
+    width: 315px;
+    height: 200px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    text-align: center;
+
+    /* Put the div in the top-right corner */
+    position: sticky;
+    top: 1%;
+    left: 99%;
+}
+
+/* Contains the rank of the player */
+.RankContainer{
+    border-bottom: 2px solid;
+    line-height : 900%;
+
+    display: block;
+    width:100%;
+    height:80%;
+}
+
+/* Contains the pseudo of the player */
+.PseudoContainer{
+    float: left;
+    display: block;
+    padding-top: 2%;
+    width:50%;
+    height:20%;
+}
+
+/* Contains the bouton to disconnect */
+.ButtonContainer{
+    float: left;
+    display: block;
+    padding-top: 2%;
+    width:50%;
+    height:20%;
+}
+
 /* Tables form */
 table{
     font-family: arial, sans-serif;
     border-collapse: collapse;
-    width: 40%;
+    width: 100%;
 }
 
 td, th{
@@ -25,6 +201,9 @@ tr:nth-child(1){
     font-weight: bold;
 }
 
+
+
+/* Temps divs */
 .HiddenDiv {
     display: none;
 }

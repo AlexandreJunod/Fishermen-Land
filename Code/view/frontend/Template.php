@@ -8,7 +8,7 @@
         <script src="public/js/jquery.js"></script>
     </head>
     <body>
-        <?= @$Error; ?>
+        <div class="ErrorMsg"><?= @$Error; ?></div>
         <?php $Error = NULL //Prevebt to show error multiple times?>
         <?= $content ?>
     </body>

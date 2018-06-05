@@ -3,7 +3,7 @@ session_start();
 require('controller/frontend.php');
 require('function/function.php');
 
-error_log(print_r($_POST, 1));
+//error_log(print_r($_POST, 1));
 
 try
 {
@@ -24,6 +24,10 @@ try
         elseif(isset($_POST['LeaveGame'])) //The player wants to leave the game
         {
             DoDeletePlace($_POST['LeaveGame'], $_SESSION['idGame']);
+        }
+        elseif(isset($_POST['DisconnectForm'])) //Disconnect and goes to the connexion page
+        {
+            DoDisconnect();
         }
         elseif(isset($_POST['NbFishing'])) //The player is fishing
         {
