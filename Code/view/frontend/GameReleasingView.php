@@ -1,11 +1,15 @@
 <?php $title = 'Fishermen Land'; ?>
 
-<?php ob_start();?>
-<form method='post'> <!-- Select number of fishes to fish -->
-    Poisson(s) à relâcher<br>
-    <input type="number" id='ValueSubmitRelease' name="NbReleasing" min="0" placeholder='0' required autofocus>
-    <button type='submit' id='PlayerSubmitRelease' name='Release' value='<?= $ShowGameInfo['NextPlayer'] ?>'>Relâcher</button>
-</form>
+<?php ob_start();
+$Error = NULL; //Prevent to show multiple times the error
+?>
+<div class="PlayButtons">
+    <form method='post'> <!-- Select number of fishes to fish -->
+        Poisson(s) à relâcher<br>
+        <input type="number" id='ValueSubmitRelease' name="NbReleasing" min="0" placeholder='0' required autofocus>
+        <button type='submit' id='PlayerSubmitRelease' name='Release' value='<?= $ShowGameInfo['NextPlayer'] ?>'>Relâcher</button>
+    </form>
+</div>
 
 <script>
 function release()

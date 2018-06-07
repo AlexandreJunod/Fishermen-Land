@@ -1,5 +1,4 @@
 <?php
-
 require('model/frontend.php');
 
 //Login the user if his pseudo and password correspond with the database
@@ -169,9 +168,12 @@ function DoCreateAndDeleteGame()
 }
 
 //List all the settings
-function GoSettings()
+function GoSettings($Pseudo)
 {
     $ListSettings = GetListSettings(); //Take the datas of the database
+    $Rank = GetRank($Pseudo);
+    extract($Rank); //$RankingPlayer
+    $AllowDisconnect = 1; //Allow the player to disconnect
 
     $ShowSettings = array(); //Create the array for the settings
     foreach($ListSettings as $ListSetting)
@@ -180,6 +182,7 @@ function GoSettings()
         array_push($ShowSettings, array('DescriptionSettings' => $ListSetting['DescriptionSettings'], 'ValueInt' => $ListSetting['ValueInt'], 'idSettings' => $ListSetting['idSettings']));
     }
     require('view/frontend/SettingsView.php');
+    require('view/frontend/InfoPlayerView.php');
 }
 
 //Update the Settings and go back to the settings page
@@ -485,7 +488,7 @@ function DoAddTour($NextPlayer, $idGame, $idPlace)
                         }
                     }
                 }
-                AddNewFishes($ShowGameInfo['LakeReproductionGame'], $ShowGameInfo['PondReproductionGame']);
+                AddNewFishes($ShowGameInfo['LakeReproductionGame'], $ShowGameInfo['PondReproductionGame'], $idGame);
             }
             elseif($NextPlayer == $ShowPlayer['OrderPlace']) //If the next player is the same, the game has ended
             {

@@ -212,8 +212,8 @@ INSERT INTO fishermenland.type (DescriptionType) VALUES ('Imposition avec forfai
 INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('MaxPlayers', '6', 'Nombre de joueurs max dans une partie');
 INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('DefaultLakeFishes', '60', 'Nombre de poissons dans le lac');
 INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('DefaulPondFishes', '3', 'Nombre de poissons par défault dans l\'étang');
-INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('ReleaseMax', '3', 'Nombre max de poissons relâchés en mode imposition avec forfait');
-INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('SeasonTour', '3', 'Nombre de tours dans une saison de pêche');
+INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('ReleaseMax', '10', 'Nombre max de poissons relâchés en mode imposition avec forfait');
+INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('SeasonTour', '18', 'Nombre de tours dans une saison de pêche');
 INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('LakeReproduction', '3', 'Reproduction dans le lac, 2 poissons en feront :');
 INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('PondReproduction', '1', 'Reproduction dans l\'étang, 2 poissons en feront :');
 INSERT INTO fishermenland.settings (NameSettings, ValueInt, DescriptionSettings) VALUES ('EatenFishes', '2', 'Nombre de poissons mangés par tour afin de survivre');

@@ -22,3 +22,6 @@ WampServer or Lamp
 6. Open the page frontend.php in Fishermen Land\Code\model
 7. Edit the line 10, to get this : $password = 'root';
 8. Open a webpage and go on the URL : localhost:8888/Fishermen%20Land/Code/
+
+## Important
+### Pour se connecter avec le compte administrateur, il faut utiliser le pseudo : Admin et le mot de passe : Admin

@@ -8,7 +8,7 @@
 
 /* Encompasses other divs and center in the middle of the page */
 .ContainerCenter{
-    width: 400px;
+    width: 420px;
     height: 350px;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 18px;
@@ -83,6 +83,7 @@
     font-family: Arial, Helvetica, sans-serif;
     font-size: 25px;
     color: red;
+    z-index: 1;
 
     /* Center the div at the middle of the screen, 20 pixels lower than the top of the screen */
     position:absolute;
@@ -92,7 +93,7 @@
 }
 
 
-/********** Divs for the home page **********/
+/********** Divs for the home and parameters page **********/
 
 /* Encompasses other divs and center in the middle of the page */
 .ContainerCenterHome{
@@ -120,11 +121,23 @@
     height:75%;
     overflow:scroll;
     overflow-x:hidden;
+    background-color: white;
 }
 
-/* Div to show the parameters button */
-.ContainerAdminView{
-    
+/* Div to show the parameters button and the button to go back to the home and leave a game*/
+.ContainerRightButton{
+    width: 200px;
+    height: 18px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+
+    /* Center the div in the middle of the page */
+    position:absolute;
+    top: 0;
+    bottom: 40%;
+    left: 87%;
+    right: 0;
+    margin: auto;
 }
 
 /********** Divs for show the infos about the player **********/
@@ -139,6 +152,7 @@
     font-family: Arial, Helvetica, sans-serif;
     font-size: 18px;
     text-align: center;
+    background-color: #f67825;
 
     /* Put the div in the top-right corner */
     position: sticky;
@@ -150,6 +164,7 @@
 .RankContainer{
     border-bottom: 2px solid;
     line-height : 900%;
+    background-image: url('../images/Rank.png');
 
     display: block;
     width:100%;
@@ -201,14 +216,171 @@ tr:nth-child(1){
     font-weight: bold;
 }
 
+/********** Divs for the game view **********/
 
+/* Encompasses other divs on the left of the page */
+.ContainerGame{
+    width: 75%;
+    height: 99%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
 
-/* Temps divs */
-.HiddenDiv {
-    display: none;
+    position:absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 20%;
+    margin: auto;
+}
+
+/* Emcopasses the divs with the lake */
+.ContainerLake{
+    width: 600px;
+    height: 400px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 30px;
+
+    position:absolute;
+    top: 0;
+    bottom: 125px;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+/* Contains the number of fishes on the lake */
+.FishesOnLake{
+    width: 100%;
+    height: 35px;
+    top: inherit;
+    background-color: grey;
+    text-align: center;
+}
+
+/* Contains the lake */
+.Lake{
+    width: 100%;
+    height: 365px;
+    bottom: inherit;
+    background-image: url('../images/Lake.png');
+    background-size: 600px 365px;
+}
+
+/* Contains the form for playing */
+.PlayButtons{
+    z-index: 1;
+    width: 99%;
+    height: 60px;
+    text-align: center;
+
+    position:absolute;
+    top: 92%;
+    margin: auto;
+}
+
+/* Emcopasses the divs for the pond of 1 player */
+.ContainerPond{
+    width: 200px;
+    height: 200px;
+    text-align: center;
+
+    position:absolute;
+    top: 675px;
+    left: 496px;
+    margin: auto;
+}
+
+/* Contains the number of fishes on the pond */
+.FishesOnPond{
+    width: 100%;
+    height: 25px;
+    top: inherit;
+    background-color: grey;
+}
+
+/* Contains the pond */
+.Pond{
+    width: 100%;
+    height: 150px;
+    background-image: url('../images/Pond.png');
+}
+
+/* Contains the name of the player on the pond */
+.NameOnPond{
+    width: 100%;
+    height: 25px;
+    bottom: inherit;
+    background-color: grey;
 }
 
 
-.DivForShow:hover + .HiddenDiv{
-    display: block;
+/* Contains the div to hover for show statistics */
+.DivToHover{
+    width: 75px;
+    height: 75px;
+    background-image: url('../images/StatShow.png');
+    background-size: 100%;
+
+    position:absolute;
+    top:0;
+    bottom: 0;
+    left: 96%;
+    margin: auto;
+}
+
+
+/* Emcopasses the divs for the scores */
+.ContainerEndGame{
+    width: 50%;
+    height: 30%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    text-align: center;
+
+    position:absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+/* Contains the scores */
+.ScoreShow{
+    width: 33%;
+    height: 50%;
+    background-color: white;
+
+    float: left;
+    position: static;
+    top: 20px;
+    left: 20px;
+    margin: auto;
+}
+
+.HiddenDiv{
+    display: none;
+    z-index: 3;
+    width: 20%;
+    height: 99%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    background-color: grey;
+    text-align: center;
+    overflow:scroll;
+    overflow-x:hidden;
+
+    position:absolute;
+    top:0;
+    bottom: 0;
+    left: 80%;
+    margin: auto;
+}
+
+.ItemHiddenDiv{
+    border: solid black;
+    z-index: 2;
+    float: left;
+    width: 98%;
+    height: 150px;
 }

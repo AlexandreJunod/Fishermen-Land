@@ -326,10 +326,10 @@ function AddTour($idGame)
 }
 
 //Add new fishes in the pond and the Lake
-function AddNewFishes($LakeReproductionGame, $PondReproductionGame)
+function AddNewFishes($LakeReproductionGame, $PondReproductionGame, $idGame)
 {
     $dbh = ConnectDB();
-    $req = $dbh->query("UPDATE fishermenland.game SET LakeFishesGame = FLOOR((LakeFishesGame/2))*$LakeReproductionGame+LakeFishesGame");
+    $req = $dbh->query("UPDATE fishermenland.game SET LakeFishesGame = FLOOR((LakeFishesGame/2))*$LakeReproductionGame+LakeFishesGame WHERE idGame = '$idGame'");
     $req = $dbh->query("UPDATE fishermenland.place SET PondFishesPlace = FLOOR((PondFishesPlace/2))*$PondReproductionGame+PondFishesPlace");
 }
 

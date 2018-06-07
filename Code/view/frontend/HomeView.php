@@ -3,6 +3,7 @@
 <?php ob_start(); ?>
 
 <!-- Show games -->
+<script> document.body.style.backgroundImage = "url('./public/images/Water.png')"; </script>
 <div class="ContainerCenterHome">
     <div class="Title">Fishermen Land</div>
     <div class="HomeBorder">

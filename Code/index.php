@@ -11,7 +11,7 @@ try
     {
         if(isset($_POST['Settings'])) //The user want to go on settings or change the value of one setting
         {
-            GoSettings();
+            GoSettings($_SESSION['Pseudo']);
         }
         elseif(isset($_POST['IdUpdateSettings'])) //The admin changed one value in the database
         {
@@ -48,6 +48,11 @@ try
         elseif(isset($_POST['ReplayGame'])) //The player want to replay the game
         {
             DoReplayGame($_SESSION['Pseudo'], $_SESSION['idGame']);
+        }
+        elseif(isset($_POST['GoHomeButton']))
+        {
+            header('location: index.php'); //Prevent to send the form multiple times
+            GoHome($_SESSION['Pseudo'], NULL);
         }
         else //The user is logged and did nothing
         {

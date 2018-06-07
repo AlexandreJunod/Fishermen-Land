@@ -1,14 +1,17 @@
 <?php $title = 'Scores'; ?>
 
 <?php ob_start();?>
-<?= "<br>Score commun : $CommonScore<br>
-Score collectif : $CollectiveScore<br>
-Score individuel : $IndividualScore<br>"?>
+<div class="ContainerEndGame">
+    <div class="ScoreShow"><p align="left"><?= "<br>Score commun : $CommonScore<br>"; ?></p></div>
+    <div class="ScoreShow"><p align="center"><?= "<br>Score collectif : $CollectiveScore<br>"; ?></p></div>
+    <div class="ScoreShow"><p align="right"><?= "<br>Score individuel : $IndividualScore<br>"; ?></p></div>
 
-<form method='post'> <!-- Leave the game or replay -->
-    <?= "<button type='submit' name='ReplayGame'>Rejouer</button>"; ?>
-    <?= "<button type='submit' id='ButtonLeaveGame' name='LeaveGame' value=".$idPlace.">Quitter la partie</button>"; ?>
-</form>
+    <form method='post'> <!-- Leave the game or replay -->
+        <?= "<button type='submit' name='ReplayGame'>Rejouer</button>"; ?>
+        <?= "<button type='submit' id='ButtonLeaveGame' name='LeaveGame' value=".$idPlace.">Quitter la partie</button>"; ?>
+    </form>
+</div>
+
 
 <script>
 function Leave()

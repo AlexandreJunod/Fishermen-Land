@@ -1,105 +1,135 @@
 <?php $title = 'Fishermen Land'; ?>
 
+
 <?php ob_start();?>
 
-<!-- Show players -->
-<h3>Fishermen Land</h3>
-<table border='1'>
-    <tr>
-        <td>id</td>
-        <td>Etang</td>
-        <td>Poissons pêchés</td>
-        <td>Poissons relachés</td>
-        <td>Ordre de jeu</td>
-        <td>Pseudo</td>
-        <td>Classement</td>
-        <td>Etat</td>
-    </tr>
-    <?php foreach($ShowPlayers as $ShowPlayer) //Reading each row of the table
-    {
-        echo "<tr>";
-        foreach ($ShowPlayer as $key => $value)
+<script> document.body.style.backgroundImage = "url('./public/images/Sand.png')"; </script>
+<div class="ContainerGame" onmouseover="closeDiv()">
+    <div class="ContainerLake">
+        <?php foreach($ShowGameInfos as $ShowGameInfo) //Reading each row of the table
         {
-            echo "<td>".$value."</td>";
-        }
-        echo "</tr>";
-    } ?>
-</table>
-<br>
-
-<!-- Show infos of the game -->
-<table border='1'>
-    <tr>
-        <td>id</td>
-        <td>Lac</td>
-        <td>Reproduction dans le lac</td>
-        <td>Reproduction dans le l'étang</td>
-        <td>Nourriture nécessaire pour survire</td>
-        <td>Premier joueur</td>
-        <td>Tour</td>
-        <td>Tours totaux</td>
-        <td>Joueurs max</td>
-        <td>Relâche max</td>
-        <td>Type de partie</td>
-        <td>Joueurs</td>
-        <td>Qui joue</td>
-        <td>Action</td>
-        <td>Prochain joueur</td>
-        <td>Futur premier joueur</td>
-        <td>Poissons totaux des etangs</td>
-    </tr>
-    <?php foreach($ShowGameInfos as $ShowGameInfo) //Reading each row of the table
-    {
-        echo "<tr>";
-        foreach ($ShowGameInfo as $key => $value)
-        {
-            echo "<td>".$value."</td>";
+            echo "<div class='FishesOnLake'>".$ShowGameInfo['LakeFishesGame']."</div>";
+            echo "<div class='Lake'></div>";
             $SumFishes = $ShowGameInfo['SumPondFishes'] + $ShowGameInfo['LakeFishesGame'];
         }
-    }
-    ?>
-</table>
-<br>
+        ?>
+    </div>
 
-<form method='post'> <!-- Leave the game -->
-    <?= "<button type='submit' name='LeaveGame' value=".$idPlace.">Quitter la partie</button>"; ?>
-</form>
+    <?php
+    $TotalSeats = 14/$ShowGameInfo['OccupedPlaces']; //There is only 14 divs possible to put players. Count how many seats are free between 2 players
+    floor($TotalSeats);
+    $Top = 675; //Define the top position of the first player. -225 to go to the top
+    $Left = 496; //Define the left poistion of the first player. -248 to go to the left
 
-<!-- Show the statistics -->
-<div class='DivForShow'>Voir les scores ? Mets ta souris ici</div>
-<div class='HiddenDiv'>
-    <h4>Statistiques</h4>
-    <?php echo "Saison de pêche ".$ShowGameInfo['TourGame']."/".$ShowGameInfo['SeasonTourGame']."<br>";
-    echo "Nombre total de poissons = $SumFishes<br>";
     foreach($ShowPlayers as $ShowPlayer) //Reading each row of the table
     {
-        foreach ($ShowPlayer as $key => $value)
+        if($ShowPlayer['DescriptionStatus'] == "Joue" || $ShowPlayer['DescriptionStatus'] == "Relâche des poissons") //Show this is the player who is playing
         {
-            if($key == 'PseudoPlayer' || $key == 'RankingPlayer' || $key == 'PondFishesPlace' || $key == 'FishedFishesPlace' || $key == 'ReleasedFishesPlace')
+            echo "<div id=".$ShowPlayer['idPlace']." style='border:solid red' class='ContainerPond'>";
+        }
+
+        if($ShowPlayer['DescriptionStatus'] == "En attente" || $ShowPlayer['DescriptionStatus'] == "Eliminé")
+        {
+            echo "<div id=".$ShowPlayer['idPlace']." class='ContainerPond'>";
+        }
+
+        if($ShowPlayer['DescriptionStatus'] == "Eliminé")
+        {
+            echo "<div class='FishesOnPond'>Eliminé</div>";
+        }
+        else
+        {
+            echo "<div class='FishesOnPond'>".$ShowPlayer['PondFishesPlace']."</div>";
+        }
+
+            echo "<div class='Pond'></div>";
+            echo "<div class='NameOnPond'>".$ShowPlayer['PseudoPlayer']."</div>";
+        echo "</div>";
+
+        ?><script>
+            var IdDiv = "<?php echo $ShowPlayer['idPlace']; ?>";
+            var Left = "<?php echo $Left; ?>";
+            var Top = "<?php echo $Top; ?>";
+            document.getElementById(IdDiv).style.left = Left;
+            document.getElementById(IdDiv).style.top = Top;
+        </script>
+        <?php
+        for($i = 0; $i < $TotalSeats; $i++) //Used for place the divs on the right place
+        {
+            if($Left != 0 && $Top == 675) //Move on the bottom line, move left
             {
-                switch ($key){ //Select the values needed to show statistics and give a div for each value
-                    case 'PseudoPlayer':
-                        echo "<div class='StatisticsPseudo'>";
-                        break;
-                    case 'RankingPlayer':
-                        echo "Classement: <div class='StatisticsRank'>";
-                        break;
-                    case 'PondFishesPlace':
-                        echo "Poisson(s) dans l'étang: <div class='StatisticsPond'>";
-                        break;
-                    case 'FishedFishesPlace':
-                        echo "Poisson(s) pêché(s): <div class='StatisticsFished'>";
-                        break;
-                    case 'ReleasedFishesPlace':
-                        echo "Poisson(s) relâché(s): <div class='StatisticsReleased'>";
-                        break;
+                $Left = $Left - 248;
+            }
+            else //Move up
+            {
+                if($Top != 0 && $Left == 0) //Move on the left line, move up
+                {
+                    $Top = $Top - 225;
                 }
-                echo $value."</div><br>";
+                else //Move right
+                {
+                    if($Left != 1240 && $Top == 0) //Move on the top line, move right
+                    {
+                        $Left = $Left + 248;
+                    }
+                    else //Move down
+                    {
+                        if($Top != 675 && $Left == 1240) //Move on the right line, move down
+                        {
+                            $Top = $Top + 225;
+                        }
+                        else //Move left
+                        {
+                            $Left = $Left - 248;
+                        }
+                    }
+                }
             }
         }
-    }?>
+    } ?>
+</div>
+<div class="ContainerRightButton">
+    <form method='post'> <!-- Leave the game -->
+        <?= "<button type='submit' name='LeaveGame' value=".$idPlace.">Quitter la partie</button>"; ?>
+    </form>
 </div>
 
+<div class="DivToHover" onmouseover="showDiv()"></div>
+<script>
+function showDiv() { //Show the div when the "DivToHover" is hover
+    document.getElementById('TheHiddenDiv').style.display = "block";
+}
+function closeDiv() { //Hide the div when the "DivToHover" is hover
+   document.getElementById('TheHiddenDiv').style.display = "none";
+}
+</script>
+<div id='TheHiddenDiv' class="HiddenDiv">
+    <h4>Statistiques</h4>
+    <?php echo "Saison de pêche : ".$ShowGameInfo['TourGame']."/".$ShowGameInfo['SeasonTourGame']." tours <br>";
+    echo "Nombre total de poissons : $SumFishes<br>";
+    echo "Nourriture nécessaire pour survire : ".$ShowGameInfo['EatFishesGame']."<br>";
+    echo "Reproduction dans le lac : ".$ShowGameInfo['LakeReproductionGame']."<br>";
+    echo "Reproduction dans l'étang : ".$ShowGameInfo['PondReproductionGame']."<br>";
+    echo "Relâche max (imposition avec forfait) : ".$ShowGameInfo['MaxReleaseGame']."<br><br>";
+
+        foreach($ShowPlayers as $ShowPlayer) //Reading each row of the table
+        {
+            if($ShowPlayer['DescriptionStatus'] == "Joue" || $ShowPlayer['DescriptionStatus'] == "Relâche des poissons") //Show this is the player who is playing
+            {
+                echo "<div style='border:solid red' class='ItemHiddenDiv'>";
+            }
+            else
+            {
+                echo "<div class='ItemHiddenDiv'>";
+            }
+                echo $ShowPlayer['PseudoPlayer']."<br><br>";
+                echo "Classement : ".$ShowPlayer['RankingPlayer']."<br>";
+                echo "Poisson(s) pêché(s) : ".$ShowPlayer['FishedFishesPlace']."<br>";
+                echo "Poisson(s) relâché(s) : ".$ShowPlayer['ReleasedFishesPlace']."<br>";
+                echo "Poisson(s) dans l'étang : ".$ShowPlayer['PondFishesPlace']."<br>";
+            echo "</div>";
+        }?>
+</div>
 <?php $content = ob_get_clean(); ?>
 
 <?php require('Template.php'); ?>
